@@ -106,17 +106,17 @@
 </head>
 <body class="text-white">
 
-  <!-- 상단 바 -->
+  <!-- 상단 인증 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
     <span id="userInfo" class="text-sm opacity-80"></span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
 
-  <!-- 메인 타이틀 영역 -->
-  <div class="w-full max-w-2xl flex items-center justify-center relative mb-6">
+  <!-- 메인 타이틀 영역: 타이틀 + 설정 아이콘 -->
+  <div class="w-full max-w-2xl flex items-center justify-center relative mb-6 px-12">
     <h1 id="mainTitleDisplay" class="text-4xl font-bold text-center text-white">만투</h1>
-    <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-400 hover:text-white transition-colors hidden">
+    <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-500 hover:text-white transition-colors hidden" title="관리자 설정">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -125,8 +125,11 @@
   </div>
   
   <!-- 메인 배너 이미지 -->
-  <img id="mainBanner" class="hidden w-full max-w-2xl rounded-xl shadow-lg mb-6 object-cover" alt="만투 메인 배너">
+  <div class="w-full max-w-2xl px-4">
+    <img id="mainBanner" class="hidden w-full rounded-xl shadow-lg mb-6 object-cover border border-gray-800" alt="만투 메인 배너">
+  </div>
 
+  <!-- 현재 주제 표시 -->
   <h2 id="currentTopicDisplay" class="text-xl font-bold text-yellow-300 text-center mb-4 hidden">
     이번 주제: <span id="currentTopicText"></span>
   </h2>
@@ -143,11 +146,11 @@
       <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
     </section>
     
-    <!-- 만화 그리드 -->
+    <!-- 만화 리스트 그리드 -->
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 관리자 설정 모달 -->
+  <!-- 관리자 설정 모달 (타이틀 변경 + 배너 업로드) -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center">관리자 설정</h2>
@@ -205,33 +208,33 @@
     </div>
   </div>
 
-  <!-- 비밀번호 입력 및 설정 모달들 -->
+  <!-- 공통 비밀번호 확인 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-xl font-bold mb-4">관리자 인증</h2>
       <input type="password" id="generalPasswordInput" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-center mb-2" placeholder="비밀번호">
       <p id="passwordErrorMessage" class="text-red-400 text-sm h-5 mb-4"></p>
       <div class="flex justify-center gap-2">
-        <button id="closePasswordModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg">취소</button>
-        <button id="confirmPasswordBtn" class="bg-slate-700 px-4 py-2 rounded-lg">확인</button>
+        <button id="closePasswordModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg font-bold">취소</button>
+        <button id="confirmPasswordBtn" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">확인</button>
       </div>
     </div>
   </div>
 
-  <!-- 제시어 입력 모달 -->
+  <!-- 제시어 설정 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
       <p class="text-sm text-gray-400 mb-4">이번 만투의 주제를 정해주세요.</p>
       <input type="text" id="topicInput" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-center mb-4" placeholder="예: 첫사랑, 점심시간 등">
       <div class="flex justify-center gap-2">
-        <button id="closeTopicModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg">취소</button>
-        <button id="submitTopicBtn" class="bg-slate-700 px-4 py-2 rounded-lg">만투 시작</button>
+        <button id="closeTopicModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg font-bold">취소</button>
+        <button id="submitTopicBtn" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">만투 시작</button>
       </div>
     </div>
   </div>
 
-  <!-- 공통 알림 모달 -->
+  <!-- 알림/확인 모달 -->
   <div id="alert-modal" class="modal">
     <div class="modal-content max-w-xs text-center">
       <p id="modal-message" class="text-white text-lg mb-6"></p>
@@ -256,24 +259,27 @@
     import { getFirestore, doc, deleteDoc, collection, onSnapshot, addDoc, updateDoc, serverTimestamp, query, orderBy, limit, deleteField, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
+    // Firebase 설정
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
       authDomain: "ne-cut-battle.firebaseapp.com",
       projectId: "ne-cut-battle",
-      storageBucket: "ne-cut-battle.appspot.com",
+      storageBucket: "ne-cut-battle.firebasestorage.app", // 최신 스토리지 주소
       messagingSenderId: "565872837701",
       appId: "1:565872837701:web:3c57c4bab8d37644018f2c"
     };
 
     const APP_ID = "necut_battle_2025";
-    const ADMIN_PW = "0614"; // 비밀번호 변경: 0614
+    const ADMIN_PW = "0614"; // 설정하신 관리자 비밀번호
 
+    // 초기화
     const app = initializeApp(FIREBASE_CONFIG);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
+    // 전역 상태
     let currentStatus = "";
     let currentTopic = "";
     let comics = [];
@@ -282,8 +288,9 @@
     let pendingAction = null;
 
     const el = (id) => document.getElementById(id);
-    const loading = el('loading-overlay');
+    const showLoading = (show) => el('loading-overlay').classList.toggle('hidden', !show);
 
+    // 알림창 유틸리티
     const showAlert = (msg, isConfirm = false) => {
       el('modal-message').textContent = msg;
       el('modal-cancel-btn').classList.toggle('hidden', !isConfirm);
@@ -294,94 +301,114 @@
       });
     };
 
-    const showLoading = (show) => loading.classList.toggle('hidden', !show);
-
+    // UI 동적 업데이트
     const updateAuthUI = (user) => {
       const isMgr = user && !user.isAnonymous;
-      if (user) {
-        el('userInfo').textContent = user.displayName;
-        el('signInBtn').classList.add('hidden');
-        el('signOutBtn').classList.remove('hidden');
-      } else {
-        el('userInfo').textContent = "로그인이 필요합니다.";
-        el('signInBtn').classList.remove('hidden');
-        el('signOutBtn').classList.add('hidden');
-      }
-      // 설정 아이콘은 관리자 로그인 시에만 노출
+      el('userInfo').textContent = user ? user.displayName : "로그인이 필요합니다.";
+      el('signInBtn').classList.toggle('hidden', !!user);
+      el('signOutBtn').classList.toggle('hidden', !user);
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
     };
 
+    // 만화 렌더링 함수
     const renderComics = () => {
       const grid = el('comic-grid');
       grid.innerHTML = '';
       const displayData = [...comics];
+      
+      // 결과 발표 시 투표순 정렬
       if (currentStatus === 'results') {
         displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
       }
+
       displayData.forEach((comic, idx) => {
-        const likeCount = Object.keys(comic.likes || {}).length;
+        const likes = Object.keys(comic.likes || {}).length;
         const hasLiked = auth.currentUser && comic.likes?.[auth.currentUser.uid];
         const isOwner = auth.currentUser && comic.uploaderId === auth.currentUser.uid;
-        let rankClass = "";
-        let medal = "";
-        if (currentStatus === 'results' && idx < 3 && likeCount > 0) {
+        
+        let rankClass = "", medal = "";
+        if (currentStatus === 'results' && idx < 3 && likes > 0) {
           rankClass = `rank-${idx + 1}`;
           medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][idx]}</div>`;
         }
+
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${currentStatus === 'uploading' ? 'disabled' : ''}`;
         card.innerHTML = `
           ${medal}
-          <div class="content"><span class="nickname-display">${comic.uploaderName}</span><span class="sub-text">${comic.images?.length || 0}컷 만화</span></div>
-          <div class="info-footer"><div class="like-section">
-            <button class="like-btn ${hasLiked ? 'liked' : ''} ${(currentStatus !== 'voting') ? 'disabled' : ''}" data-id="${comic.id}">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg>
-              <span>따봉</span>
-            </button><span class="like-count">${likeCount}</span>
-          </div></div>
-          ${isOwner && currentStatus !== 'results' ? `<button class="absolute top-2 right-2 text-red-400 p-1 bg-black bg-opacity-30 rounded-full delete-btn" data-id="${comic.id}">✕</button>` : ''}
+          <div class="content">
+            <span class="nickname-display">${comic.uploaderName}</span>
+            <span class="sub-text">${comic.images?.length || 0}컷 만화</span>
+          </div>
+          <div class="info-footer">
+            <div class="like-section">
+              <button class="like-btn ${hasLiked ? 'liked' : ''} ${currentStatus !== 'voting' ? 'disabled' : ''}" data-id="${comic.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg>
+                <span>따봉</span>
+              </button>
+              <span class="like-count">${likes}</span>
+            </div>
+          </div>
+          ${isOwner && currentStatus !== 'results' ? `<button class="absolute top-2 right-2 text-red-400 p-1 bg-black bg-opacity-30 rounded-full delete-btn">✕</button>` : ''}
         `;
+
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
-          if (currentStatus === 'uploading') return showAlert('업로드 기간이 끝나면 볼 수 있습니다.');
+          if (currentStatus === 'uploading') return showAlert('업로드 마감 후에 볼 수 있습니다.');
           if (currentStatus === 'upload_ended') {
-              pendingAction = () => openViewer(comic);
-              showPasswordModal("관리자 미리보기");
-              return;
+            pendingAction = () => openViewer(comic);
+            showPasswordModal("관리자 미리보기");
+            return;
           }
           openViewer(comic);
         };
-        card.querySelector('.like-btn').onclick = (e) => { e.stopPropagation(); if (currentStatus !== 'voting') return showAlert('투표 기간이 아닙니다.'); toggleLike(comic.id); };
-        const del = card.querySelector('.delete-btn');
-        if (del) del.onclick = (e) => { e.stopPropagation(); handleDelete(comic.id); };
+
+        const likeBtn = card.querySelector('.like-btn');
+        likeBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (currentStatus === 'voting') toggleLike(comic.id);
+          else showAlert('아직 투표 기간이 아닙니다.');
+        };
+
+        if (isOwner) {
+          card.querySelector('.delete-btn').onclick = (e) => {
+            e.stopPropagation();
+            handleDelete(comic.id);
+          };
+        }
         grid.appendChild(card);
       });
     };
 
+    // 작품 확대 보기
     const openViewer = (comic) => {
       el('modalComicNickname').textContent = `${comic.uploaderName} 작가의 작품`;
       const container = el('modalImageContainer');
       container.innerHTML = '';
       comic.images.forEach(img => {
-        const i = document.createElement('img'); i.src = img.imageUrl; i.className = "w-full rounded-lg shadow-md";
+        const i = document.createElement('img');
+        i.src = img.imageUrl;
+        i.className = "w-full rounded-lg shadow-md";
         container.appendChild(i);
       });
       el('imageModal').style.display = 'flex';
     };
 
+    // 실시간 데이터 동기화
     const setupSync = () => {
+      // 설정 동기화
       onSnapshot(doc(db, `artifacts/${APP_ID}/public/data/config/current`), (d) => {
-        const data = d.data();
-        currentStatus = data?.status || "";
-        currentTopic = data?.topic || "";
+        const data = d.data(); if (!data) return;
+        currentStatus = data.status || ""; currentTopic = data.topic || "";
         
-        // 타이틀 동적 업데이트
-        const appTitle = data?.appTitle || "만투";
-        el('mainTitleDisplay').textContent = appTitle;
-        document.title = `${appTitle} - 네컷만화 투표`;
-
-        if (data?.bannerUrl) { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
+        // 타이틀 반영
+        el('mainTitleDisplay').textContent = data.appTitle || "만투";
+        document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
+        
+        // 배너 반영
+        if (data.bannerUrl) { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
+        
         el('currentTopicText').textContent = currentTopic;
         el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
         
@@ -394,137 +421,176 @@
         el('resetContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "results");
         renderComics();
       });
+
+      // 만화 데이터 동기화
       const q = query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snap) => { comics = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderComics(); });
+      onSnapshot(q, (snap) => {
+        comics = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderComics();
+      });
     };
 
+    // 투표 기능
     const toggleLike = async (id) => {
-      if (!auth.currentUser) return showAlert("로그인이 필요합니다.");
       const comic = comics.find(c => c.id === id);
       const uid = auth.currentUser.uid;
       const userHasLikedAny = comics.some(c => c.id !== id && c.likes?.[uid]);
       if (!comic.likes?.[uid] && userHasLikedAny) return showAlert("투표는 한 작품에만 가능합니다!");
-      const ref = doc(db, `artifacts/${APP_ID}/public/data/comics`, id);
-      await updateDoc(ref, { [`likes.${uid}`]: comic.likes?.[uid] ? deleteField() : true });
+      
+      await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), {
+        [`likes.${uid}`]: comic.likes?.[uid] ? deleteField() : true
+      });
     };
 
+    // 작품 삭제
     const handleDelete = async (id) => {
       if (await showAlert("정말로 이 작품을 삭제하시겠습니까?", true)) {
         showLoading(true);
         const comic = comics.find(c => c.id === id);
-        for (const img of comic.images) { if (img.path) await deleteObject(storageRef(storage, img.path)).catch(() => {}); }
+        for (const img of comic.images) if (img.path) await deleteObject(storageRef(storage, img.path)).catch(() => {});
         await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id));
         showLoading(false);
       }
     };
 
+    // 비밀번호 확인 모달 제어
     const showPasswordModal = (title) => {
-      el('passwordModalTitle').textContent = title; el('generalPasswordInput').value = ''; el('passwordErrorMessage').textContent = '';
+      el('passwordModalTitle').textContent = title;
+      el('generalPasswordInput').value = '';
+      el('passwordErrorMessage').textContent = '';
       el('generalPasswordModal').style.display = 'flex';
+      el('generalPasswordInput').focus();
     };
 
     el('confirmPasswordBtn').onclick = () => {
       if (el('generalPasswordInput').value === ADMIN_PW) { 
-        el('generalPasswordModal').style.display = 'none'; 
+        el('generalPasswordModal').style.display = 'none';
         if (pendingAction) { pendingAction(); pendingAction = null; } 
+      } else {
+        el('passwordErrorMessage').textContent = "비밀번호가 틀렸습니다.";
       }
-      else { el('passwordErrorMessage').textContent = "비밀번호가 올바르지 않습니다."; }
     };
 
+    // 이미지 업로드 미리보기 및 드래그 앤 드롭
     el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files).slice(0, 4); renderPreviews(); };
     const renderPreviews = () => {
       const area = el('imagePreviewArea'); area.innerHTML = '';
       uploadedFiles.forEach((file, i) => {
         const div = document.createElement('div'); div.className = 'preview-container'; div.draggable = true;
         div.innerHTML = `<span class="preview-number">${i+1}</span><img src="${URL.createObjectURL(file)}" class="preview-image">`;
-        div.ondragstart = () => { dragStartIndex = i; div.classList.add('dragging'); };
-        div.ondragover = (ev) => ev.preventDefault();
-        div.ondrop = () => { const item = uploadedFiles.splice(dragStartIndex, 1)[0]; uploadedFiles.splice(i, 0, item); renderPreviews(); };
-        div.ondragend = () => div.classList.remove('dragging'); area.appendChild(div);
+        div.ondragstart = () => dragStartIndex = i;
+        div.ondrop = () => {
+          const item = uploadedFiles.splice(dragStartIndex, 1)[0];
+          uploadedFiles.splice(i, 0, item);
+          renderPreviews();
+        };
+        div.ondragover = (e) => e.preventDefault();
+        area.appendChild(div);
       });
     };
 
+    // 최종 만화 제출
     el('submitComicBtn').onclick = async () => {
       const name = el('uploadNickname').value.trim();
       if (!name || uploadedFiles.length === 0) return showAlert("닉네임과 이미지를 확인해주세요.");
       showLoading(true);
       try {
-        const comicRef = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
+        const comicRef = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`));
+        const imgs = [];
         for (let i = 0; i < uploadedFiles.length; i++) {
-          const path = `mantu/${APP_ID}/${comicRef.id}/${i}_${Date.now()}`; const sRef = storageRef(storage, path);
-          await uploadBytesResumable(sRef, uploadedFiles[i]); const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
+          const path = `mantu/${APP_ID}/${comicRef.id}/${i}_${Date.now()}`;
+          const sRef = storageRef(storage, path);
+          await uploadBytesResumable(sRef, uploadedFiles[i]);
+          const url = await getDownloadURL(sRef);
+          imgs.push({ imageUrl: url, path });
         }
-        await setDoc(comicRef, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: currentTopic });
-        el('uploadModal').style.display = 'none'; showAlert("작품이 성공적으로 등록되었습니다!");
+        await setDoc(comicRef, {
+          uploaderId: auth.currentUser.uid,
+          uploaderName: name,
+          images: imgs,
+          likes: {},
+          timestamp: serverTimestamp(),
+          topic: currentTopic
+        });
+        el('uploadModal').style.display = 'none';
+        showAlert("성공적으로 등록되었습니다!");
       } catch (e) { showAlert("오류: " + e.message); }
       showLoading(false);
     };
 
-    // 설정 모달 열기
+    // --- 관리자 설정 기능 ---
     el('openSettingsBtn').onclick = () => {
       pendingAction = () => {
         el('newTitleInput').value = el('mainTitleDisplay').textContent;
         el('settingsModal').style.display = 'flex';
       };
-      showPasswordModal("관리자 설정 접속");
+      showPasswordModal("관리자 설정");
     };
 
-    // 설정 모달 닫기
-    el('closeSettingsModalBtn').onclick = () => {
-      el('settingsModal').style.display = 'none';
-    };
-
-    // 타이틀 저장
     el('saveTitleBtn').onclick = async () => {
-      const title = el('newTitleInput').value.trim();
-      if (!title) return showAlert("타이틀을 입력해주세요.");
       showLoading(true);
-      try {
-        await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: title }, { merge: true });
-        showAlert("타이틀이 변경되었습니다.");
-      } catch (e) { showAlert("오류: " + e.message); }
+      await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), {
+        appTitle: el('newTitleInput').value
+      }, { merge: true });
+      showAlert("타이틀이 변경되었습니다.");
       showLoading(false);
     };
 
-    // 배너 업로드 처리 (설정 모달 내부용)
     el('triggerBannerBtn').onclick = () => el('bannerFileInput').click();
-
     el('bannerFileInput').onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+      const file = e.target.files[0]; if (!file) return;
       showLoading(true);
       try {
-        const path = `mantu/banners/${APP_ID}/main_banner_${Date.now()}`;
-        const sRef = storageRef(storage, path);
+        const sRef = storageRef(storage, `mantu/banners/${APP_ID}/banner_${Date.now()}`);
         await uploadBytesResumable(sRef, file);
         const url = await getDownloadURL(sRef);
         await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true });
-        showAlert("배너 이미지가 성공적으로 변경되었습니다.");
-      } catch (e) { showAlert("배너 업로드 실패: " + e.message); }
+        showAlert("배너가 변경되었습니다.");
+      } catch (e) { showAlert("실패: " + e.message); }
       showLoading(false);
     };
 
+    // --- 대전 상태 제어 기능 ---
     el('startContestBtn').onclick = () => { pendingAction = () => el('topicModal').style.display = 'flex'; showPasswordModal("대전 시작"); };
     el('submitTopicBtn').onclick = async () => {
-      const topic = el('topicInput').value.trim(); if (!topic) return;
-      showLoading(true); await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic, updatedAt: serverTimestamp() }, { merge: true });
-      el('topicModal').style.display = 'none'; showLoading(false);
+      showLoading(true);
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), {
+        status: 'uploading', topic: el('topicInput').value, updatedAt: serverTimestamp()
+      }, { merge: true });
+      el('topicModal').style.display = 'none';
+      showLoading(false);
     };
-    el('endContestBtn').onclick = () => { pendingAction = async () => await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }); showPasswordModal("업로드 마감"); };
-    el('startVotingBtn').onclick = () => { pendingAction = async () => await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { pendingAction = async () => await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }); showPasswordModal("결과 발표"); };
+
+    el('endContestBtn').onclick = () => { pendingAction = () => updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }); showPasswordModal("업로드 마감"); };
+    el('startVotingBtn').onclick = () => { pendingAction = () => updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }); showPasswordModal("투표 시작"); };
+    el('endVotingBtn').onclick = () => { pendingAction = () => updateDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }); showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       pendingAction = async () => {
-        if (await showAlert("초기화하시겠습니까?", true)) {
+        if (await showAlert("모든 데이터를 초기화하시겠습니까?", true)) {
           showLoading(true);
-          for (const c of comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
+          for (const c of comics) {
+            for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{});
+            await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id));
+          }
           await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true });
           showLoading(false);
         }
-      }; showPasswordModal("전체 초기화");
+      };
+      showPasswordModal("초기화");
     };
 
-    onAuthStateChanged(auth, (user) => { updateAuthUI(user); if (user) setupSync(); });
+    // 인증 상태 변화 감지
+    onAuthStateChanged(auth, (user) => { 
+      updateAuthUI(user);
+      if (user) setupSync(); 
+      else { 
+        currentStatus = ""; currentTopic = ""; comics = []; 
+        el('mainBanner').classList.add('hidden');
+        renderComics(); 
+      }
+    });
+
+    // 기본 이벤트 바인딩
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
     el('showUploadModalBtn').onclick = () => el('uploadModal').style.display = 'flex';
@@ -532,6 +598,7 @@
     el('closeImageModalBtn').onclick = () => el('imageModal').style.display = 'none';
     el('closePasswordModalBtn').onclick = () => el('generalPasswordModal').style.display = 'none';
     el('closeTopicModalBtn').onclick = () => el('topicModal').style.display = 'none';
+    el('closeSettingsModalBtn').onclick = () => el('settingsModal').style.display = 'none';
   </script>
 </body>
 </html>
