@@ -6,9 +6,6 @@
   <title>만투 - 네컷만화 투표</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"/>
-  <!-- 파일 압축 및 저장을 위한 라이브러리 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -47,11 +44,11 @@
       width: 100%; 
       display: block; 
       cursor: pointer; 
-      border: 4px solid transparent; 
+      border: 3px solid transparent; 
     }
     .comic-card.disabled { cursor: not-allowed; opacity: 0.7; }
     
-    /* 순위 메달 디자인 강조 */
+    /* 순위 메달 스타일 강화 */
     .comic-card.rank-1 { border-color: #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); z-index: 10; scale: 1.05; }
     .comic-card.rank-2 { border-color: #C0C0C0; box-shadow: 0 0 20px rgba(192, 192, 192, 0.3); }
     .comic-card.rank-3 { border-color: #CD7F32; box-shadow: 0 0 20px rgba(205, 127, 50, 0.3); }
@@ -85,7 +82,7 @@
     }
     .like-btn.liked { background: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
     .like-btn:not(.disabled):hover:not(.liked) { background: #555; }
-    .like-btn.disabled { background: #333; color: #666; cursor: not-allowed; }
+    .like-btn.disabled { background: #333; color: #777; cursor: not-allowed; }
     .like-count { font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-left: 8px; }
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -106,9 +103,9 @@
 </head>
 <body class="text-white">
 
-  <!-- 상단 바 -->
+  <!-- 상단 인증 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-3 mb-2">
-    <span id="userInfo" class="text-sm font-bold text-blue-400">데이터를 불러오는 중...</span>
+    <span id="userInfo" class="text-sm font-bold text-gray-400">연결 대기 중...</span>
     <button id="signInBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg font-bold hidden">로그인</button>
     <button id="signOutBtn" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg font-bold hidden">로그아웃</button>
   </div>
@@ -124,27 +121,35 @@
     </button>
   </div>
   
+  <!-- 배너 영역 -->
   <div class="w-full max-w-2xl px-4">
     <img id="mainBanner" class="hidden w-full rounded-xl shadow-2xl mb-8 object-cover border-2 border-gray-800" alt="배너">
   </div>
 
+  <!-- 대전 주제 표시 -->
   <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-300 text-center mb-8 hidden">
     이번 주제: <span id="currentTopicText" class="px-2 bg-yellow-900 bg-opacity-30 rounded"></span>
   </h2>
 
+  <!-- 콘텐츠 구역 -->
   <div id="comics-section" class="section-card text-left">
     <section class="text-center mb-8 flex flex-wrap justify-center gap-4">
+      <!-- 💡 '대전 시작' 버튼: 관리자 전용 -->
       <button id="startContestBtn" class="admin-button hidden">대전 시작</button>
-      <button id="showUploadModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl text-xl shadow-lg hidden">+ 작품 올리기</button>
+      
+      <!-- 💡 대전 상태에 따라 동적으로 나타나는 버튼들 -->
+      <button id="showUploadModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl text-xl shadow-lg transform transition active:scale-95 hidden">+ 작품 올리기</button>
       <button id="endContestBtn" class="admin-button hidden">업로드 마감</button>
       <button id="startVotingBtn" class="admin-button hidden">투표 시작</button>
       <button id="endVotingBtn" class="admin-button hidden">투표 종료 및 결과 발표</button>
       <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
     </section>
+
+    <!-- 작품 그리드 (데이터 없을 시 완전 빈 공간) -->
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 설정 모달 -->
+  <!-- 관리자 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
       <h2 class="text-2xl font-black mb-8">관리자 센터</h2>
@@ -156,17 +161,11 @@
         <label class="block text-sm font-bold text-gray-400 mb-1">JPG 배너 업로드</label>
         <button id="triggerBannerBtn" class="w-full bg-gray-700 py-4 rounded-lg font-bold border-2 border-dashed border-gray-600">파일 선택</button><input type="file" id="bannerFileInput" accept="image/*">
       </div>
-      <div class="mb-8 pt-6 border-t border-gray-800">
-        <button id="downloadAllComicsBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-lg font-black flex items-center justify-center gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-          모든 작품 다운로드 (.zip)
-        </button>
-      </div>
       <div class="flex justify-center mt-4"><button id="closeSettingsModalBtn" class="bg-gray-600 px-10 py-2 rounded-lg font-bold">닫기</button></div>
     </div>
   </div>
 
-  <!-- 상세보기 모달 -->
+  <!-- 작품 상세보기 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative">
       <button id="closeImageModalBtn" class="absolute top-4 right-4 text-white bg-black bg-opacity-60 rounded-full w-10 h-10 flex items-center justify-center z-50 text-2xl">✕</button>
@@ -186,20 +185,22 @@
     </div>
   </div>
 
-  <!-- 인증 모달 (보안 강화) -->
+  <!-- 관리자 인증 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
-      <h2 id="passwordModalTitle" class="text-2xl font-black mb-6">관리자 인증</h2>
-      <input type="password" id="generalPasswordInput" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white text-center mb-6 font-bold" placeholder="비밀번호 입력">
+      <h2 id="passwordModalTitle" class="text-2xl font-black mb-6">인증 절차</h2>
+      <!-- 💡 Placeholder에서 비밀번호 힌트 제거 -->
+      <input type="password" id="generalPasswordInput" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white text-center mb-6 font-bold" placeholder="비밀번호를 입력하세요">
       <div class="flex justify-center gap-3"><button id="closePasswordModalBtn" class="bg-gray-700 px-6 py-2 rounded-lg font-bold">취소</button><button id="confirmPasswordBtn" class="bg-blue-700 px-6 py-2 rounded-lg font-black">확인</button></div>
     </div>
   </div>
 
+  <!-- 주제 설정 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-2xl font-black mb-6">제시어 입력</h2>
       <input type="text" id="topicInput" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white text-center mb-6 font-bold" placeholder="예: 첫사랑, 점심시간">
-      <div class="flex justify-center gap-3"><button id="closeTopicModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg font-bold">취소</button><button id="submitTopicBtn" class="bg-blue-700 px-6 py-2 rounded-lg font-black">만투 시작!</button></div>
+      <div class="flex justify-center gap-3"><button id="closeTopicModalBtn" class="bg-gray-700 px-6 py-2 rounded-lg font-bold">취소</button><button id="submitTopicBtn" class="bg-blue-700 px-6 py-2 rounded-lg font-black">만투 시작!</button></div>
     </div>
   </div>
 
@@ -211,7 +212,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, setDoc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject, getBlob } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
     const FB_CONFIG = {
       apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
@@ -244,8 +245,13 @@
       const grid = el('comic-grid'); grid.innerHTML = '';
       let list = [...state.comics];
       if (state.topic) list = list.filter(c => c.topic === state.topic);
-      if (state.status === 'results') list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
-      if (list.length === 0) { grid.innerHTML = `<p class="col-span-full py-32 opacity-40 text-center w-full font-bold text-lg">${state.status ? '등록된 작품이 없습니다.' : '대전을 기다려 주세요.'}</p>`; return; }
+      
+      if (state.status === 'results') {
+        list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
+      }
+
+      // 💡 '대전을 기다려 주세요' 문구를 제거하고 아무것도 표시하지 않음
+      if (list.length === 0) return;
 
       list.forEach((c, i) => {
         const likes = Object.keys(c.likes || {}).length;
@@ -260,18 +266,18 @@
 
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
-        card.innerHTML = `${medal}<div class="content"><span class="nickname-display">${c.uploaderName}</span><span class="sub-text">${c.images?.length}컷 작품</span></div><div class="info-footer"><div class="like-section"><button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}"><span>따봉</span></button><span class="like-count">${likes}</span></div></div>${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-bold">✕</button>` : ''}`;
+        card.innerHTML = `${medal}<div class="content"><span class="nickname-display">${c.uploaderName}</span><span class="sub-text">${c.images?.length}컷</span></div><div class="info-footer"><div class="like-section"><button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}"><span>따봉</span></button><span class="like-count">${likes}</span></div></div>${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-bold">✕</button>` : ''}`;
         
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
-          if (state.status === 'uploading') return showAlert('업로드 마감 후에 작품이 공개됩니다.');
-          if (state.status === 'upload_ended') { state.pending = () => openViewer(c); showPasswordModal("관리자용 미리보기"); return; }
+          if (state.status === 'uploading') return showAlert('마감 후에 작품이 공개됩니다.');
+          if (state.status === 'upload_ended') { state.pending = () => openViewer(c); showPasswordModal("관리자용 열람"); return; }
           openViewer(c);
         };
         card.querySelector('.like-btn').onclick = (e) => { 
           e.stopPropagation(); 
           if (state.status === 'voting') toggleLike(c.id); 
-          else showAlert(state.status === 'results' ? '투표가 끝났습니다.' : '투표 기간이 아닙니다.'); 
+          else showAlert(state.status === 'results' ? '투표가 종료되었습니다.' : '투표 기간이 아닙니다.'); 
         };
         if (isOwner && card.querySelector('.del-btn')) card.querySelector('.del-btn').onclick = (e) => { e.stopPropagation(); handleDelete(c.id); };
         grid.appendChild(card);
@@ -305,8 +311,9 @@
     };
 
     const refreshButtons = () => {
-      const isMgr = auth.currentUser && !auth.currentUser.isAnonymous;
-      el('userInfo').textContent = auth.currentUser ? (auth.currentUser.displayName || "관리자") : "방문자 모드";
+      const user = auth.currentUser;
+      const isMgr = user && !user.isAnonymous;
+      el('userInfo').textContent = user ? (user.displayName || "관리자") : "방문자 모드";
       el('startContestBtn').classList.toggle('hidden', !isMgr || state.status !== "");
       el('showUploadModalBtn').classList.toggle('hidden', !isMgr || state.status !== "uploading");
       el('endContestBtn').classList.toggle('hidden', !isMgr || state.status !== "uploading");
@@ -314,8 +321,8 @@
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
       el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      el('signInBtn').classList.toggle('hidden', !!auth.currentUser);
-      el('signOutBtn').classList.toggle('hidden', !auth.currentUser);
+      el('signInBtn').classList.toggle('hidden', !!user);
+      el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
@@ -345,7 +352,7 @@
     };
 
     const resizeImg = (file, maxWidth = 1280, quality = 0.8) => {
-      return new Promise((res, rej) => {
+      return new Promise((res) => {
         const reader = new FileReader(); reader.readAsDataURL(file);
         reader.onload = (e) => {
           const img = new Image(); img.src = e.target.result;
@@ -357,9 +364,7 @@
             const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
             canvas.toBlob((b) => res(b.size < file.size ? b : file), 'image/jpeg', quality);
           };
-          img.onerror = rej;
         };
-        reader.onerror = rej;
       });
     };
 
@@ -369,15 +374,15 @@
       if (state.files.length === 0) return;
       state.files.forEach((f, i) => {
         const div = document.createElement('div'); div.className = 'preview-container';
-        div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="preview-image"><button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold">✕</button>`;
+        div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="preview-image"><button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold shadow-lg">✕</button>`;
         div.querySelector('button').onclick = () => { state.files.splice(i, 1); renderPreviews(); };
         area.appendChild(div);
       });
     };
 
     el('submitComicBtn').onclick = async () => {
-      const name = el('uploadNickname').value.trim(); if (!name || state.files.length === 0) return showAlert("이름과 이미지를 모두 입력해주세요.");
-      showLoading(true, "이미지 압축 및 전송 중...");
+      const name = el('uploadNickname').value.trim(); if (!name || state.files.length === 0) return showAlert("닉네임과 이미지를 입력해주세요.");
+      showLoading(true, "이미지 최적화 및 전송 중...");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
         for (let i = 0; i < state.files.length; i++) {
@@ -387,7 +392,7 @@
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
         await setDoc(ref, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: state.topic });
-        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 등록되었습니다!");
+        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 성공적으로 등록되었습니다!");
       } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
     };
 
@@ -404,35 +409,8 @@
         const b = await resizeImg(e.target.files[0], 1920, 0.9);
         const sRef = storageRef(storage, `mantu/banners/${APP_ID}/main_${Date.now()}.jpg`);
         await uploadBytesResumable(sRef, b); const url = await getDownloadURL(sRef);
-        await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true }); showAlert("배너가 성공적으로 변경되었습니다.");
-      } catch (e) { showAlert("배너 업로드에 실패했습니다."); } showLoading(false);
-    };
-
-    // 💡 개편된 다운로드 로직: 캐시 무효화 파라미터 추가
-    el('downloadAllComicsBtn').onclick = async () => {
-      if (state.comics.length === 0) return showAlert("다운로드할 작품이 없습니다.");
-      showLoading(true, "작품 수집 및 압축 중...");
-      const zip = new JSZip();
-      try {
-        for (const c of state.comics) {
-          const folder = zip.folder(c.uploaderName.replace(/[/\\?%*:|"<>]/g, '-'));
-          for (let i = 0; i < c.images.length; i++) {
-            let blob;
-            try {
-              // 1순위: getBlob 사용
-              blob = await getBlob(storageRef(storage, c.images[i].path));
-            } catch (err) {
-              // 2순위: 캐시 방지 파라미터를 붙여 fetch 시도
-              const url = await getDownloadURL(storageRef(storage, c.images[i].path));
-              const response = await fetch(url + "&t=" + Date.now(), { mode: 'cors' });
-              blob = await response.blob();
-            }
-            folder.file(`${i + 1}.jpg`, blob);
-          }
-        }
-        saveAs(await zip.generateAsync({ type: "blob" }), `만투_전체작품_${new Date().toLocaleDateString()}.zip`);
-        showAlert("다운로드가 시작되었습니다!");
-      } catch (e) { showAlert("CORS 설정 미반영 혹은 서버 오류입니다. 5분 뒤 다시 시도해주세요."); } showLoading(false);
+        await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true }); showAlert("배너 이미지가 변경되었습니다.");
+      } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
     };
 
     el('startContestBtn').onclick = () => { state.pending = () => el('topicModal').style.display = 'flex'; showPasswordModal("대전 시작"); };
@@ -440,12 +418,12 @@
       showLoading(true); await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic: el('topicInput').value, updatedAt: serverTimestamp() }, { merge: true });
       el('topicModal').style.display = 'none'; showLoading(false);
     };
-    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("마감"); };
+    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
     el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
-        if (confirm("정말로 초기화하시겠습니까?")) {
+        if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
           showLoading(true);
           for (const c of state.comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
           await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true }); showLoading(false);
@@ -453,7 +431,7 @@
       }; showPasswordModal("초기화");
     };
 
-    // 💡 초기화 로직
+    // 💡 초기 실행
     setupSync();
     onAuthStateChanged(auth, (user) => {
       refreshButtons();
