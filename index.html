@@ -369,12 +369,16 @@
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
       el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      el('signInBtn').classList.toggle('hidden', !!user);
+
+      // ✅ FIX: 익명 로그인(user는 있음) 상태에서도 LOGIN 버튼은 보여야 구글 로그인으로 전환 가능
+      el('signInBtn').classList.toggle('hidden', !!user && !user.isAnonymous);
       el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
-      if (!auth.currentUser) return showAlert("투표하려면 로그인이 필요합니다.");
+      // ✅ FIX: 익명도 투표 가능했던 부분 차단 (구글 로그인 필요)
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
+
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
       if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만 할 수 있습니다!");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
@@ -407,7 +411,13 @@
           img.onload = () => {
             const canvas = document.createElement('canvas');
             let w = img.width, h = img.height;
-            if (w > maxWidth) { h = Math.round((height * maxWidth) / width); w = maxWidth; }
+
+            // ✅ FIX: width/height 미정의 변수 사용 버그 수정
+            if (w > maxWidth) { 
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth; 
+            }
+
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
             canvas.toBlob((b) => res(b.size < file.size ? b : file), 'image/jpeg', quality);
@@ -435,6 +445,12 @@
     };
 
     el('submitComicBtn').onclick = async () => {
+      // ✅ FIX: 업로드는 구글 로그인 필요(익명 업로드 방지)
+      if (!auth.currentUser || auth.currentUser.isAnonymous) {
+        await showAlert("업로드하려면 구글 로그인이 필요합니다.");
+        return;
+      }
+
       const name = el('uploadNickname').value.trim(); 
       if (!name || state.files.length === 0) return showAlert("닉네임과 작품 사진을 확인해 주세요.");
       showLoading(true, "Processing...");
