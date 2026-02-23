@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>네컷만화 대전</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #000; /* 검은색 배경으로 복귀 */
+      color: #fff;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .section-card {
+      background: #2a2a2a; /* 다크 모드 카드 배경 */
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,.3);
+      text-align: center;
+      width: 100%;
+      max-width: 1200px;
+    }
+    #comic-grid { column-count: 2; column-gap: 1rem; margin-top: 1.5rem; display: block; }
+    @media (min-width: 640px) { #comic-grid { column-count: 3; } }
+    @media (min-width: 1024px) { #comic-grid { column-count: 4; } }
+    @media (min-width: 1280px) { #comic-grid { column-count: 5; } }
+    .comic-card { position: relative; transition: all .2s ease-in-out; background: #333; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; break-inside: avoid; width: 100%; display: block; cursor: pointer; border: 3px solid transparent; } /* 다크 모드 카드 */
+    .comic-card.disabled { cursor: not-allowed; opacity: 0.7; }
+    .comic-card.rank-1 { border-color: #FFD700; }
+    .comic-card.rank-2 { border-color: #C0C0C0; }
+    .comic-card.rank-3 { border-color: #CD7F32; }
+    .rank-medal { position: absolute; top: 8px; left: 8px; font-size: 1.8rem; line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 10; }
+    .comic-card:not(.disabled):hover { transform: translateY(-5px); background: #444; } /* 다크 모드 호버 */
+    .comic-card .content { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 120px; padding: 16px; text-align: center; background-color: #1a1a1a; position: relative; } /* 다크 모드 카드 내부 */
+    .comic-card .nickname-display { font-size: 1.25rem; font-weight: 700; color: #fff; word-break: break-all; }
+    .comic-card .sub-text { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
+    .comic-card .info-footer { padding: 12px; background: #333; text-align: left; } /* 다크 모드 카드 푸터 */
+    .comic-card .like-section { display: flex; justify-content: space-between; align-items: center; }
+    .like-btn { display: flex; align-items: center; gap: 6px; background: #555; color: white; padding: 6px 10px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; transition: all 0.2s ease; cursor: pointer; border: none; } /* 다크 모드 버튼 */
+    .like-btn.liked { background: #374151; color: white; } /* 슬레이트 강조 (slate-700) */
+    .like-btn:not(.disabled):hover:not(.liked) { background: #666; }
+    .like-btn.disabled { background: #444; color: #777; cursor: not-allowed; }
+    .like-count { font-size: 0.9rem; font-weight: 700; color: #ddd; }
+    #imageModal.modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    #imageModal .modal-content { background-color: #1a1a1a; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,.5); border-radius: 12px; max-width: 90vw; max-height: 90vh; width: auto; height: auto; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; cursor: default; overflow-y: auto; } /* 다크 모드 모달 */
+    #modalComicNickname { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #444; width: 100%; text-align: center; }
+    #modalComicTopic { font-size: 1rem; font-weight: 400; color: #bbb; margin-bottom: 1rem; text-align: center; }
+    #modalImageContainer { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 500px; }
+    #modalImageContainer img { width: 100%; height: auto; display: block; border-radius: 8px; }
+    #modalImage { display: none; }
+    #uploadModal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    #uploadModal .modal-content { background: #2a2a2a; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.5); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; } /* 다크 모드 모달 */
+    #imagePreviewArea { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem; padding: 10px; background: #1a1a1a; border-radius: 8px; min-height: 100px; } /* 다크 모드 배경 */
+    
+    /* --- 드래그 앤 드롭 및 번호 표시용 CSS --- */
+    .preview-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      cursor: grab;
+      transition: transform 0.2s ease;
+    }
+    .preview-container.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    .preview-image { 
+      width: 100%; 
+      height: 100%;
+      object-fit: cover; 
+      border-radius: 4px; 
+    }
+    .preview-number {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 10;
+      pointer-events: none; /* 드래그 이벤트를 방해하지 않도록 함 */
+    }
+    /* --- --- */
+
+    .file-input-label { background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; transition: background .2s; }
+    .file-input-label:hover { background: #555; }
+    #comicFilesInput { display: none; }
+    .admin-button { background: #475569; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; transition: background .2s; } /* 슬레이트 강조 (slate-600) */
+    .admin-button:hover { background: #334155; } /* 슬레이트 강조 (slate-700) */
+    #endContestBtn { background: #475569; }
+    #endContestBtn:hover { background: #334155; }
+    #startVotingBtn { background: #475569; }
+    #startVotingBtn:hover { background: #334155; }
+    #endVotingBtn { background: #475569; }
+    #endVotingBtn:hover { background: #334155; }
+    #resetContestBtn { background: #475569; }
+    #resetContestBtn:hover { background: #334155; }
+    .password-modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; justify-content: center; align-items: center; z-index: 1001; }
+    .password-modal .modal-content { background: #2a2a2a; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.5); width: 90%; max-width: 400px; text-align: center; } /* 다크 모드 모달 + 가운데 정렬 */
+    .password-modal h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    .password-modal input[type="text"], .password-modal input[type="password"] { width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; border: 1px solid #444; color: white; font-size: 1rem; text-align: center; } /* 다크 모드 입력창 + 가운데 정렬 */
+    .password-modal p { color: #F87171; font-size: 0.8rem; height: 1.2rem; margin-top: 0.25rem; } /* 에러 (red-400) */
+    @media (max-width:768px){
+      body{padding:12px;gap:0.5rem}.section-card{padding:12px;border-radius:0}
+      #uploadModal .modal-content { width: 95%; padding: 16px; }
+      #imagePreviewArea { grid-template-columns: repeat(2, 1fr); }
+      #modalImageContainer { max-width: 100%; }
+    }
+
+    /* --- 테마에 맞는 스크롤바 --- */
+    /* Firefox */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #555 #000; /* thumb-color track-color */
+    }
+    
+    /* Webkit (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent; /* 트랙 배경 투명 */
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #555; /* 스크롤바 색상 (like-btn과 동일) */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #777; /* 호버 시 색상 */
+    }
+    /* --- --- */
+
+  </style>
+</head>
+<body class="text-white">
+
+  <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
+    <span id="userInfo" class="text-sm opacity-80"></span>
+    <!-- 슬레이트 테마 버튼 -->
+    <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded">Google 로그인</button>
+    <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
+  </div>
+
+  <!-- 제목 수정: '제2회' 삭제 -->
+  <h1 class="text-3xl font-bold text-center text-white">
+    네컷만화 대전
+  </h1>
+  
+  <!-- 다크 모드 텍스트 (기존) -->
+  <h2 id="currentTopicDisplay" class="text-xl font-bold text-yellow-300 text-center mb-4 hidden">
+    주제: <span id="currentTopicText"></span>
+  </h2>
+
+  <div id="comics-section" class="section-card text-left">
+    <section class="text-center mb-6 flex flex-wrap justify-center gap-4">
+      <button id="startContestBtn" class="admin-button">대전 시작하기</button>
+      <!-- 슬레이트 테마 버튼 -->
+      <button id="showUploadModalBtn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-105 hidden">+ 네컷만화 올리기</button>
+      <button id="endContestBtn" class="admin-button hidden">올리기 종료</button>
+      <button id="startVotingBtn" class="admin-button hidden">투표 시작하기</button>
+      <button id="endVotingBtn" class="admin-button hidden">투표 종료 (결과 발표)</button>
+      <button id="resetContestBtn" class="admin-button hidden">대전 초기화하기</button>
+    </section>
+    <section id="comic-grid"></section>
+  </div>
+
+  <div id="imageModal" class="modal">
+    <div class="modal-content relative">
+      <button id="closeImageModalBtn" class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-1 z-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <h3 id="modalComicNickname" class="text-xl font-bold mb-2 text-white text-center"></h3>
+      <!-- 주제 숨김 -->
+      <h4 id="modalComicTopic" class="text-lg text-yellow-300 mb-4 text-center hidden"></h4>
+      <div id="modalImageContainer"></div>
+      <img id="modalImage" src="" alt="확대 이미지" class="hidden" />
+    </div>
+  </div>
+
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <h2 class="text-2xl font-bold mb-4">네컷만화 올리기</h2>
+      <div class="mb-4">
+        <label for="uploadNickname" class="block text-sm font-medium text-gray-300 mb-1">닉네임</label>
+        <input type="text" id="uploadNickname" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-white" placeholder="작가명을 입력하세요">
+      </div>
+      <div class="mb-4">
+        <label for="comicFilesInput" class="file-input-label">만화 이미지 선택 (최대 4장)</label>
+        <input type="file" id="comicFilesInput" multiple accept="image/*">
+        <!-- 팁 문구 삭제 -->
+      </div>
+      <div id="imagePreviewArea">
+        <span class="text-gray-500 text-sm self-center justify-self-center col-span-2">이미지 미리보기</span>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="cancelUploadBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitComicBtn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg">제출</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="contestPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>대전 시작하기</h2>
+      <input type="password" id="contestPasswordInput" placeholder="비밀번호">
+      <p id="contestPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelContestPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitContestPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">다음</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="topicModal" class="password-modal">
+    <div class="modal-content">
+      <h2>제시어 입력</h2>
+      <label for="topicInput" class="block text-sm font-medium text-gray-300 mb-1">이번 대전의 제시어</label>
+      <input type="text" id="topicInput" placeholder="예: 우주, 라면, ...">
+      <p id="topicError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelTopic" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitTopic" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">대전 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="contestEndPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>업로드 종료</h2>
+      <input type="password" id="contestEndPasswordInput" placeholder="비밀번호">
+      <p id="contestEndPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelContestEndPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitContestEndPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">종료</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="contestStartVotingPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>투표 시작</h2>
+      <input type="password" id="contestStartVotingPasswordInput" placeholder="비밀번호">
+      <p id="contestStartVotingPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelContestStartVotingPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitContestStartVotingPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">투표 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="contestEndVotingPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>투표 종료 (결과 발표)</h2>
+      <input type="password" id="contestEndVotingPasswordInput" placeholder="비밀번호">
+      <p id="contestEndVotingPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelContestEndVotingPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitContestEndVotingPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">결과 발표</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resetContestPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>대전 초기화</h2>
+      <input type="password" id="resetContestPasswordInput" placeholder="비밀번호">
+      <p id="resetContestPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelResetContestPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitResetContestPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminPreviewPasswordModal" class="password-modal">
+    <div class="modal-content">
+      <h2>관리자 미리보기</h2>
+      <input type="password" id="adminPreviewPasswordInput" placeholder="비밀번호">
+      <p id="adminPreviewPasswordError"></p>
+      <!-- 버튼 중앙 정렬 -->
+      <div class="flex justify-center gap-2 mt-4">
+        <button id="cancelAdminPreviewPassword" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+        <!-- 슬레이트 테마 버튼 -->
+        <button id="submitAdminPreviewPassword" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="alert-modal" class="fixed inset-0 bg-[#1a1a1a] bg-opacity-50 flex items-center justify-center hidden z-[1002]">
+    <div class="bg-[#242424] rounded-lg p-6 shadow-xl max-w-sm mx-auto">
+      <p id="modal-message" class="text-white text-lg text-center font-medium"></p>
+      <div class="mt-4 flex justify-center gap-4">
+        <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 hidden">취소</button>
+        <button id="modal-confirm-btn" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-[1001] flex items-center justify-center hidden">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+      <p class="text-white mt-4 text-lg">데이터를 불러오는 중...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth,      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, doc, deleteDoc, collection, onSnapshot, 
+      addDoc, updateDoc, serverTimestamp, query, orderBy, 
+      limit, deleteField, setDoc
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+
+    // 1) Firebase 설정 (귀하가 제공한 값, storageBucket 수정 포함)
+    const YOUR_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
+      authDomain: "ne-cut-battle.firebaseapp.com",
+      projectId: "ne-cut-battle",
+      storageBucket: "ne-cut-battle.appspot.com",
+      messagingSenderId: "565872837701",
+      appId: "1:565872837701:web:3c57c4bab8d37644018f2c",
+      measurementId: "G-EDHCL46T9M"
+    };
+
+    // 2) Canvas App ID: Gemini에서 자동 제공되는 값이 아닌 경우 직접 이름 지정
+    //    Firestore 데이터 경로는 artifacts/{CANVAS_APP_ID_FOR_FIRESTORE}/public/data/...
+    const CANVAS_APP_ID_FOR_FIRESTORE = "necut_battle_2025";
+
+    // 관리자 비밀번호 (배포 시 변경 권장)
+    const ADMIN_PASSWORD = "1234";
+
+    // 전역 상태
+    window.comics = [];
+    window.isAuthReady = false;
+    window.currentTopic = "";
+    window.currentContestStatus = "";
+    window.comicToPreview = null;
+    let uploadedFiles = []; // 드래그 앤 드롭으로 순서를 바꿀 수 있는 파일 배열
+    let dragStartIndex = null; // 드래그 시작 인덱스
+
+    // DOM
+    const comicGrid = document.getElementById('comic-grid');
+    const imageModal = document.getElementById('imageModal');
+    const modalImageContainer = document.getElementById('modalImageContainer'); 
+    const modalComicNickname = document.getElementById('modalComicNickname');
+    const modalComicTopic = document.getElementById('modalComicTopic');
+    const closeImageModalBtn = document.getElementById('closeImageModalBtn');
+
+    const startContestBtn = document.getElementById('startContestBtn');
+    const showUploadModalBtn = document.getElementById('showUploadModalBtn');
+    const endContestBtn = document.getElementById('endContestBtn');
+    const startVotingBtn = document.getElementById('startVotingBtn');
+    const endVotingBtn = document.getElementById('endVotingBtn');
+    const resetContestBtn = document.getElementById('resetContestBtn');
+
+    const currentTopicDisplay = document.getElementById('currentTopicDisplay');
+    const currentTopicText = document.getElementById('currentTopicText');
+
+    const uploadModal = document.getElementById('uploadModal');
+    const uploadNickname = document.getElementById('uploadNickname');
+    const comicFilesInput = document.getElementById('comicFilesInput');
+    const imagePreviewArea = document.getElementById('imagePreviewArea');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+    const submitComicBtn = document.getElementById('submitComicBtn');
+
+    const alertModal = document.getElementById('alert-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+    const contestPasswordModal = document.getElementById('contestPasswordModal');
+    const contestPasswordInput = document.getElementById('contestPasswordInput');
+    const contestPasswordError = document.getElementById('contestPasswordError');
+    const cancelContestPassword = document.getElementById('cancelContestPassword');
+    const submitContestPassword = document.getElementById('submitContestPassword');
+
+    const topicModal = document.getElementById('topicModal');
+    const topicInput = document.getElementById('topicInput');
+    const topicError = document.getElementById('topicError');
+    const cancelTopic = document.getElementById('cancelTopic');
+    const submitTopic = document.getElementById('submitTopic');
+
+    const contestEndPasswordModal = document.getElementById('contestEndPasswordModal');
+    const contestEndPasswordInput = document.getElementById('contestEndPasswordInput');
+    const contestEndPasswordError = document.getElementById('contestEndPasswordError');
+    const cancelContestEndPassword = document.getElementById('cancelContestEndPassword');
+    const submitContestEndPassword = document.getElementById('submitContestEndPassword');
+
+    const contestStartVotingPasswordModal = document.getElementById('contestStartVotingPasswordModal');
+    const contestStartVotingPasswordInput = document.getElementById('contestStartVotingPasswordInput');
+    const contestStartVotingPasswordError = document.getElementById('contestStartVotingPasswordError');
+    const cancelContestStartVotingPassword = document.getElementById('cancelContestStartVotingPassword');
+    const submitContestStartVotingPassword = document.getElementById('submitContestStartVotingPassword');
+
+    const contestEndVotingPasswordModal = document.getElementById('contestEndVotingPasswordModal');
+    const contestEndVotingPasswordInput = document.getElementById('contestEndVotingPasswordInput');
+    const contestEndVotingPasswordError = document.getElementById('contestEndVotingPasswordError');
+    const cancelContestEndVotingPassword = document.getElementById('cancelContestEndVotingPassword');
+    const submitContestEndVotingPassword = document.getElementById('submitContestEndVotingPassword');
+
+    const resetContestPasswordModal = document.getElementById('resetContestPasswordModal');
+    const resetContestPasswordInput = document.getElementById('resetContestPasswordInput');
+    const resetContestPasswordError = document.getElementById('resetContestPasswordError');
+    const cancelResetContestPassword = document.getElementById('cancelResetContestPassword');
+    const submitResetContestPassword = document.getElementById('submitResetContestPassword');
+
+    const adminPreviewPasswordModal = document.getElementById('adminPreviewPasswordModal');
+    const adminPreviewPasswordInput = document.getElementById('adminPreviewPasswordInput');
+    const adminPreviewPasswordError = document.getElementById('adminPreviewPasswordError');
+    const cancelAdminPreviewPassword = document.getElementById('cancelAdminPreviewPassword');
+    const submitAdminPreviewPassword = document.getElementById('submitAdminPreviewPassword');
+
+    const authBar = document.getElementById('authBar');
+    const signInBtn = document.getElementById('signInBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const userInfoEl = document.getElementById('userInfo');
+    const loadingOverlay = document.getElementById('loading-overlay');
+
+    const showFeedbackMessage = (message) => {
+      const el = document.createElement('div');
+      el.textContent = message;
+      el.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:16px 20px;border-radius:10px;z-index:2000;max-width:90%";
+      document.body.appendChild(el); setTimeout(()=>el.remove(),2000);
+    };
+
+    const showAlert = (msg) => {
+      modalMessage.textContent = msg;
+      modalCancelBtn.classList.add('hidden');
+      modalConfirmBtn.textContent = '확인';
+      alertModal.classList.remove('hidden');
+      return new Promise((resolve) => {
+        modalConfirmBtn.onclick = () => { alertModal.classList.add('hidden'); resolve(true); };
+      });
+    };
+
+    const showConfirm = (msg) => {
+      modalMessage.textContent = msg;
+      modalCancelBtn.classList.remove('hidden');
+      modalConfirmBtn.textContent = '삭제';
+      alertModal.classList.remove('hidden');
+      return new Promise((resolve) => {
+        modalConfirmBtn.onclick = () => { alertModal.classList.add('hidden'); resolve(true); };
+        modalCancelBtn.onclick = () => { alertModal.classList.add('hidden'); resolve(false); };
+      });
+    };
+
+    const openComicViewerModal = (comic) => {
+      if (!comic || !comic.images) return;
+      modalComicNickname.textContent = comic.uploaderName || '익명 작가';
+      modalComicTopic.textContent = comic.topic ? `주제: ${comic.topic}` : '';
+      modalImageContainer.innerHTML = '';
+      comic.images.forEach(imgData => {
+        const img = document.createElement('img');
+        img.src = imgData.imageUrl;
+        img.alt = "네컷만화 이미지";
+        img.loading = "lazy";
+        modalImageContainer.appendChild(img);
+      });
+      imageModal.style.display='flex';
+    };
+    const closeImageModal = () => { imageModal.style.display = 'none'; };
+
+    const openUploadModal = () => {
+      if (!window.ensureLogin || !window.ensureLogin(true)) return;
+      uploadNickname.value = window.auth?.currentUser?.displayName || '';
+      comicFilesInput.value = '';
+      uploadedFiles = []; // 업로드 파일 배열 초기화
+      imagePreviewArea.innerHTML = '<span class="text-gray-500 text-sm self-center justify-self-center col-span-2">이미지 미리보기</span>';
+      uploadModal.style.display = 'flex';
+    };
+    const closeUploadModal = () => { uploadModal.style.display = 'none'; };
+
+    // --- 드래그 앤 드롭 기능 함수 ---
+
+    const handleFilePreview = () => {
+      const files = comicFilesInput.files;
+      if (files.length === 0) {
+        uploadedFiles = [];
+      } else {
+        uploadedFiles = Array.from(files).slice(0, 4);
+      }
+      renderPreviewArea();
+    };
+
+    const renderPreviewArea = () => {
+      imagePreviewArea.innerHTML = '';
+      if (uploadedFiles.length === 0) {
+        imagePreviewArea.innerHTML = '<span class="text-gray-500 text-sm self-center justify-self-center col-span-2">이미지 미리보기</span>';
+        return;
+      }
+
+      uploadedFiles.forEach((file, index) => {
+        const container = document.createElement('div');
+        container.className = 'preview-container';
+        container.draggable = true;
+        container.dataset.index = index;
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'preview-number';
+        numberSpan.textContent = index + 1;
+
+        const img = document.createElement('img');
+        // File 객체로 Object URL 생성
+        img.src = URL.createObjectURL(file); 
+        img.className = 'preview-image';
+        // 메모리 누수 방지를 위해 로드 후 Object URL 해제
+        img.onload = () => {
+          URL.revokeObjectURL(img.src); 
+        }
+
+        container.appendChild(numberSpan);
+        container.appendChild(img);
+        imagePreviewArea.appendChild(container);
+
+        // 드래그 이벤트 리스너 추가
+        container.addEventListener('dragstart', onDragStart);
+        container.addEventListener('dragover', onDragOver);
+        container.addEventListener('drop', onDrop);
+        container.addEventListener('dragend', onDragEnd);
+      });
+    };
+
+    const onDragStart = (e) => {
+      dragStartIndex = Number(e.currentTarget.dataset.index);
+      e.currentTarget.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const onDragOver = (e) => {
+      e.preventDefault(); // 드롭을 허용하기 위해 필수
+    };
+
+    const onDrop = (e) => {
+      e.preventDefault();
+      const dragEndIndex = Number(e.currentTarget.dataset.index);
+      swapFiles(dragStartIndex, dragEndIndex);
+      dragStartIndex = null;
+      onDragEnd(e); // 클래스 정리
+    };
+
+    const onDragEnd = (e) => {
+      // 모든 요소에서 dragging 클래스 제거
+      imagePreviewArea.querySelectorAll('.preview-container').forEach(el => {
+        el.classList.remove('dragging');
+      });
+    };
+
+    const swapFiles = (fromIndex, toIndex) => {
+      if (fromIndex === toIndex) return;
+      
+      // uploadedFiles 배열에서 요소 순서 변경
+      const item = uploadedFiles.splice(fromIndex, 1)[0];
+      uploadedFiles.splice(toIndex, 0, item);
+      
+      // 변경된 순서로 미리보기 영역 다시 렌더링
+      renderPreviewArea();
+    };
+
+    // --- ---
+
+    const closeAllPasswordModals = () => {
+      contestPasswordModal.style.display = 'none';
+      topicModal.style.display = 'none';
+      contestEndPasswordModal.style.display = 'none';
+      contestStartVotingPasswordModal.style.display = 'none';
+      contestEndVotingPasswordModal.style.display = 'none';
+      adminPreviewPasswordModal.style.display = 'none';
+      resetContestPasswordModal.style.display = 'none';
+      [contestPasswordInput, topicInput, contestEndPasswordInput, contestStartVotingPasswordInput, contestEndVotingPasswordInput, adminPreviewPasswordInput, resetContestPasswordInput].forEach(input => input.value = '');
+      [contestPasswordError, topicError, contestEndPasswordError, contestStartVotingPasswordError, contestEndVotingPasswordError, adminPreviewPasswordError, resetContestPasswordError].forEach(err => err.textContent = '');
+    };
+
+    const attachEventListeners=()=>{
+      closeImageModalBtn.addEventListener('click', closeImageModal);
+      imageModal.addEventListener('click',(e)=>{ if(e.target === imageModal) closeImageModal(); });
+      showUploadModalBtn.addEventListener('click', openUploadModal);
+      cancelUploadBtn.addEventListener('click', closeUploadModal);
+      submitComicBtn.addEventListener('click', () => { if (window.handleSubmitComic) window.handleSubmitComic(); });
+      comicFilesInput.addEventListener('change', handleFilePreview);
+
+      startContestBtn.addEventListener('click', () => {
+        if (!window.ensureLogin || !window.ensureLogin(true)) return;
+        closeAllPasswordModals();
+        contestPasswordModal.style.display = 'flex';
+        contestPasswordInput.focus();
+      });
+      cancelContestPassword.addEventListener('click', closeAllPasswordModals);
+      submitContestPassword.addEventListener('click', () => {
+        if (contestPasswordInput.value === ADMIN_PASSWORD) {
+          contestPasswordModal.style.display = 'none';
+          topicModal.style.display = 'flex';
+          topicInput.focus();
+        } else {
+          contestPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      cancelTopic.addEventListener('click', closeAllPasswordModals);
+      submitTopic.addEventListener('click', () => {
+        const topic = topicInput.value.trim();
+        if (topic) {
+          if (window.setTopicAndStart) window.setTopicAndStart(topic);
+          closeAllPasswordModals();
+        } else {
+          topicError.textContent = '제시어를 입력해주세요.';
+        }
+      });
+
+      endContestBtn.addEventListener('click', () => {
+        if (!window.ensureLogin || !window.ensureLogin(true)) return;
+        closeAllPasswordModals();
+        contestEndPasswordModal.style.display = 'flex';
+        contestEndPasswordInput.focus();
+      });
+      cancelContestEndPassword.addEventListener('click', closeAllPasswordModals);
+      submitContestEndPassword.addEventListener('click', () => {
+        if (contestEndPasswordInput.value === ADMIN_PASSWORD) {
+          if (window.endContestUploadingPhase) window.endContestUploadingPhase();
+          closeAllPasswordModals();
+        } else {
+          contestEndPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      startVotingBtn.addEventListener('click', () => {
+        if (!window.ensureLogin || !window.ensureLogin(true)) return;
+        closeAllPasswordModals();
+        contestStartVotingPasswordModal.style.display = 'flex';
+        contestStartVotingPasswordInput.focus();
+      });
+      cancelContestStartVotingPassword.addEventListener('click', closeAllPasswordModals);
+      submitContestStartVotingPassword.addEventListener('click', () => {
+        if (contestStartVotingPasswordInput.value === ADMIN_PASSWORD) {
+          if (window.startVotingPhase) window.startVotingPhase();
+          closeAllPasswordModals();
+        } else {
+          contestStartVotingPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      endVotingBtn.addEventListener('click', () => {
+        if (!window.ensureLogin || !window.ensureLogin(true)) return;
+        closeAllPasswordModals();
+        contestEndVotingPasswordModal.style.display = 'flex';
+        contestEndVotingPasswordInput.focus();
+      });
+      cancelContestEndVotingPassword.addEventListener('click', closeAllPasswordModals);
+      submitContestEndVotingPassword.addEventListener('click', () => {
+        if (contestEndVotingPasswordInput.value === ADMIN_PASSWORD) {
+          if (window.endVotingPhase) window.endVotingPhase();
+          closeAllPasswordModals();
+        } else {
+          contestEndVotingPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      resetContestBtn.addEventListener('click', () => {
+        if (!window.ensureLogin || !window.ensureLogin(true)) return;
+        closeAllPasswordModals();
+        resetContestPasswordModal.style.display = 'flex';
+        resetContestPasswordInput.focus();
+      });
+      cancelResetContestPassword.addEventListener('click', closeAllPasswordModals);
+      submitResetContestPassword.addEventListener('click', () => {
+        if (resetContestPasswordInput.value === ADMIN_PASSWORD) {
+          if (window.resetContest) window.resetContest();
+          closeAllPasswordModals();
+        } else {
+          resetContestPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      cancelAdminPreviewPassword.addEventListener('click', closeAllPasswordModals);
+      submitAdminPreviewPassword.addEventListener('click', () => {
+        if (adminPreviewPasswordInput.value === ADMIN_PASSWORD) {
+          closeAllPasswordModals();
+          if (window.comicToPreview) {
+            openComicViewerModal(window.comicToPreview);
+            window.comicToPreview = null;
+          }
+        } else {
+          adminPreviewPasswordError.textContent = '비밀번호가 틀렸습니다.';
+        }
+      });
+
+      signInBtn.onclick = () => doSignIn();
+      signOutBtn.onclick = () => signOut(auth);
+    };
+
+    const handleTopicSet = (status, topic) => {
+      window.currentContestStatus = status || "";
+      window.currentTopic = topic || "";
+      if (topic && status) {
+        currentTopicText.textContent = topic;
+        currentTopicDisplay.classList.remove('hidden');
+      } else {
+        currentTopicDisplay.classList.add('hidden');
+      }
+
+      const isLoggedIn = window.isAuthReady && window.auth?.currentUser;
+      const isAnonymous = window.auth?.currentUser?.isAnonymous;
+      const isManager = isLoggedIn && !isAnonymous;
+
+      startContestBtn.classList.add('hidden');
+      showUploadModalBtn.classList.add('hidden');
+      endContestBtn.classList.add('hidden');
+      startVotingBtn.classList.add('hidden');
+      endVotingBtn.classList.add('hidden');
+      resetContestBtn.classList.add('hidden');
+
+      if (isManager) {
+        if (!status) {
+          startContestBtn.classList.remove('hidden');
+        } else if (status === 'uploading') {
+          showUploadModalBtn.classList.remove('hidden');
+          endContestBtn.classList.remove('hidden');
+        } else if (status === 'upload_ended') {
+          startVotingBtn.classList.remove('hidden');
+        } else if (status === 'voting') {
+          endVotingBtn.classList.remove('hidden');
+        } else if (status === 'results') {
+          resetContestBtn.classList.remove('hidden');
+        }
+      }
+
+      renderComics();
+    };
+
+    const renderComics = () => {
+      if (!comicGrid) return;
+      const comicsData = [...(window.comics || [])];
+
+      if (window.currentContestStatus === 'results') {
+        comicsData.sort((a, b) => {
+          const likesA = Object.keys(a.likes || {}).length;
+          const likesB = Object.keys(b.likes || {}).length;
+          return likesB - likesA;
+        });
+      }
+
+      comicGrid.innerHTML = '';
+
+      let ranks = {};
+      if (window.currentContestStatus === 'results' && comicsData.length > 0) {
+        let currentRank = 0;
+        let rankCounter = 0;
+        let lastLikeCount = -1;
+        comicsData.forEach(comic => {
+          const likeCount = Object.keys(comic.likes || {}).length;
+          rankCounter++;
+          if (likeCount !== lastLikeCount) {
+            currentRank = rankCounter;
+            lastLikeCount = likeCount;
+          }
+          if (currentRank <= 3 && likeCount > 0) {
+            ranks[comic.id] = currentRank;
+          }
+        });
+      }
+
+      comicsData.forEach(d => {
+        const uploaderName = d.uploaderName || '익명';
+        const likeMap = d.likes || {};
+        const likeCount = Object.keys(likeMap).length;
+        const imageCount = d.images?.length || 0;
+        const currentUserId = window.auth?.currentUser?.uid;
+        const userHasLiked = currentUserId && likeMap[currentUserId] === true;
+        const status = window.currentContestStatus;
+        const likeDisabled = (status === 'uploading' || status === 'upload_ended' || status === 'results');
+        const cardClickDisabled = (status === 'uploading');
+        const rank = ranks[d.id] || 0;
+
+        const card = document.createElement('div');
+        card.className = `comic-card relative group ${cardClickDisabled ? 'disabled' : ''} ${rank > 0 ? `rank-${rank}` : ''}`;
+        card.dataset.id = d.id;
+        card.innerHTML = `
+          ${rank > 0 ? `<div class="rank-medal">${['🥇', '🥈', '🥉'][rank-1]}</div>` : ''}
+          <div class="content" data-action="view">
+            <span class="nickname-display">${uploaderName}</span>
+            <span class="sub-text">${imageCount}컷 만화</span>
+          </div>
+          <div class="info-footer">
+            <div class="like-section">
+              <button class="like-btn ${userHasLiked ? 'liked' : ''} ${likeDisabled ? 'disabled' : ''}" data-id="${d.id}" data-action="like">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z" />
+                </svg>
+                <span>따봉!</span>
+              </button>
+              <span class="like-count">${likeCount} 명이 좋아합니다</span>
+            </div>
+          </div>
+          ${(currentUserId === d.uploaderId && window.currentContestStatus !== 'results') ? `
+          <button class="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-20" data-id="${d.id}" data-action="delete">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          ` : ''}
+        `;
+        comicGrid.appendChild(card);
+      });
+
+      comicGrid.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.onclick = async (e) => { 
+          e.stopPropagation(); 
+          const id = e.currentTarget.dataset.id;
+          const action = e.currentTarget.dataset.action;
+          if (action === 'delete') {
+            if (window.deleteComic) await window.deleteComic(id);
+          } else if (action === 'like') {
+            if (e.currentTarget.classList.contains('disabled')) {
+              const status = window.currentContestStatus;
+              if (status === 'uploading' || status === 'upload_ended') {
+                showAlert('아직 투표 기간이 아닙니다.');
+              } else if (status === 'results') {
+                showAlert('투표가 마감되었습니다.');
+              }
+              return;
+            }
+            if (window.toggleLike) await window.toggleLike(id);
+          }
+        };
+      });
+
+      comicGrid.querySelectorAll('.comic-card').forEach(card => {
+        card.onclick = (e) => {
+          if (e.target.closest('button[data-action]')) return;
+          const status = window.currentContestStatus;
+          if (status === 'uploading') {
+            showAlert('아직 만화를 볼 수 없습니다. (업로드 기간)');
+            return;
+          }
+          const id = card.dataset.id;
+          const comic = window.comics.find(c => c.id === id);
+          if (!comic) return;
+          if (status === 'upload_ended') {
+            if (!window.ensureLogin || !window.ensureLogin(true)) {
+              showAlert('투표가 시작되면 만화를 볼 수 있습니다.');
+              return;
+            }
+            window.comicToPreview = comic;
+            closeAllPasswordModals();
+            adminPreviewPasswordModal.style.display = 'flex';
+            adminPreviewPasswordInput.focus();
+            return;
+          }
+          if (status === 'voting' || status === 'results') {
+            openComicViewerModal(comic);
+          }
+        };
+      });
+    };
+
+    const app = initializeApp(YOUR_FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    window.auth = auth;
+    const provider = new GoogleAuthProvider();
+    async function doSignIn(){
+      try { await signInWithPopup(auth, provider); }
+      catch(e){
+        console.error("Firebase Auth Error:", e);
+        let errorMessage = e.message || e.code;
+        if (e.code === 'auth/unauthorized-domain') {
+          errorMessage = "승인되지 않은 도메인입니다. Firebase 'Authentication > 설정 > 승인된 도메인'에 이 웹사이트의 도메인을 추가하세요.";
+        }
+        showAlert('로그인 오류: ' + errorMessage);
+      }
+    }
+
+    window.cloudRefs = () => {
+      if (!CANVAS_APP_ID_FOR_FIRESTORE) {
+        console.error("설정 오류: CANVAS_APP_ID_FOR_FIRESTORE 값을 설정해야 합니다!");
+        showAlert("설정 오류: CANVAS_APP_ID_FOR_FIRESTORE가 설정되지 않았습니다.");
+        return null;
+      }
+      return {
+        configDoc: doc(db, `artifacts/${CANVAS_APP_ID_FOR_FIRESTORE}/public/data/config/current`),
+        comicsCol: collection(db, `artifacts/${CANVAS_APP_ID_FOR_FIRESTORE}/public/data/comics`),
+      };
+    };
+
+    window.ensureLogin = (requireManager = false) => {
+      if (!window.isAuthReady) { showAlert('데이터 로딩 중입니다.'); return false; }
+      if (!auth.currentUser) { showAlert('로그인 후 이용해 주세요.'); return false; }
+      if (requireManager && auth.currentUser.isAnonymous) {
+        showAlert('콘텐츠를 업로드하거나 관리하려면 Google 계정으로 로그인해야 합니다. (우측 상단 로그인 버튼)');
+        return false;
+      }
+      return true;
+    };
+
+const uploadToStorage = async (file, contestKey, comicId, index) => {
+  if (!file) throw new Error('업로드할 파일이 없습니다.');
+  const safeName = (file.name || 'image').replace(/[^\w.\-]+/g, "_");
+  const path = `necut/${CANVAS_APP_ID_FOR_FIRESTORE}/${contestKey}/${auth.currentUser.uid}/${comicId}/${String(index).padStart(2,'0')}_${Date.now()}_${safeName}`;
+  const fileRef = storageRef(storage, path);
+
+  const task = uploadBytesResumable(fileRef, file);
+  await new Promise((resolve, reject) => {
+    task.on('state_changed', null, (err) => reject(err), () => resolve(true));
+  });
+
+  const url = await getDownloadURL(fileRef);
+  return { imageUrl: url, path };
+};
+
+
+    window.handleSubmitComic = async () => {
+  if (!ensureLogin(true)) return;
+  const nickname = document.getElementById('uploadNickname').value.trim();
+
+  // FileList가 아닌, 순서 변경이 적용된 'uploadedFiles' 배열을 사용합니다.
+  const filesToUpload = uploadedFiles.slice(0, 4);
+
+  if (!nickname) { showAlert('닉네임을 입력해주세요.'); return; }
+  if (filesToUpload.length === 0) { showAlert('하나 이상의 이미지를 선택해주세요.'); return; }
+  if (!window.currentTopic) { showAlert('현재 진행 중인 대전이 없습니다.'); return; }
+
+  loadingOverlay.classList.remove('hidden');
+  showFeedbackMessage(`만화 ${filesToUpload.length}장 업로드 중...`);
+  try {
+    const refs = cloudRefs();
+    if (!refs) return;
+
+    // Firestore 문서 ID를 먼저 확보해서, Storage 경로에 사용합니다.
+    const comicDocRef = doc(refs.comicsCol);
+    const contestKey = (window.currentTopic || 'contest').replace(/\s+/g, '_').slice(0, 50);
+
+    const uploadPromises = filesToUpload.map((file, idx) => uploadToStorage(file, contestKey, comicDocRef.id, idx));
+    const uploadedImagesData = await Promise.all(uploadPromises);
+
+    await setDoc(comicDocRef, {
+      images: uploadedImagesData, // [{imageUrl, path}]
+      uploaderId: auth.currentUser.uid,
+      uploaderName: nickname,
+      uploaderDisplayName: auth.currentUser.displayName || '익명',
+      topic: window.currentTopic,
+      timestamp: serverTimestamp(),
+      likes: {}
+    });
+
+    showFeedbackMessage('만화가 성공적으로 등록되었습니다!');
+    if(typeof closeUploadModal === 'function') closeUploadModal();
+  } catch (err) {
+    showAlert('만화 업로드 실패: ' + (err.message || '오류'));
+  } finally {
+    loadingOverlay.classList.add('hidden');
+  }
+};
+
+
+    window.deleteComic = async (id)=>{
+  if(!ensureLogin(true)) return;
+  try{
+    const comic = (window.comics||[]).find(d=>d.id===id);
+    if(!comic) throw new Error('만화 항목을 찾을 수 없습니다.');
+    if(comic.uploaderId !== auth.currentUser.uid) { showAlert('자신이 올린 만화만 삭제할 수 있습니다.'); return; }
+    if (!(await showConfirm('정말로 이 만화를 삭제하시겠습니까?'))) return;
+    const refs = cloudRefs();
+    if (!refs) return;
+
+    // Storage 파일 삭제 (best-effort)
+    try {
+      if(comic.images && Array.isArray(comic.images)){
+        const delPromises = comic.images
+          .filter(img => img.path)
+          .map(img => deleteObject(storageRef(storage, img.path)).catch(e => console.error("Storage 삭제 오류:", e)));
+        await Promise.allSettled(delPromises);
+      }
+    } catch(e) { console.warn("Storage 삭제 실패 (무시함):", e); }
+
+    await deleteDoc(doc(refs.comicsCol, id));
+    showFeedbackMessage('만화가 삭제되었습니다.');
+  }catch(e){
+    showAlert('만화 삭제 중 오류: '+(e?.message||'unknown'));
+  }
+};
+
+
+    window.toggleLike = async (id) => {
+      if (!ensureLogin(true)) return;
+      const userId = auth.currentUser.uid;
+      const refs = cloudRefs();
+      if (!refs) return;
+      const comicRef = doc(refs.comicsCol, id);
+      const comic = window.comics.find(c => c.id === id);
+      if (!comic) return;
+      const userHasLikedThis = (comic.likes || {})[userId] === true;
+
+      // 사용자가 이미 다른 만화에 투표했는지 확인
+      const userHasLikedAny = window.comics.some(c => c.id !== id && (c.likes || {})[userId] === true);
+
+      try {
+        if (userHasLikedThis) {
+          // '좋아요' 취소
+          await updateDoc(comicRef, { [`likes.${userId}`]: deleteField() });
+        } else if (userHasLikedAny) {
+          // 이미 다른 곳에 투표함
+          showAlert('투표는 한 작품에만 할 수 있습니다.');
+        } else {
+          // 첫 '좋아요'
+          await updateDoc(comicRef, { [`likes.${userId}`]: true });
+        }
+      } catch (e) {
+        console.error("좋아요 업데이트 오류:", e);
+        showAlert("좋아요 상태를 업데이트하는 중 오류가 발생했습니다.");
+      }
+    };
+
+    const updateContestConfig = async (topic, status) => {
+      if (!ensureLogin(true)) return;
+      try {
+        const refs = cloudRefs();
+        if (!refs) return;
+        await setDoc(refs.configDoc, { topic: topic, status: status, updatedAt: serverTimestamp() }, { merge: true });
+      } catch (e) {
+        showAlert('대전 상태 업데이트 실패: ' + e.message);
+      }
+    };
+
+    window.setTopicAndStart = async (topic) => { await updateContestConfig(topic, 'uploading'); showFeedbackMessage('대전을 시작합니다! (업로드 기간)'); };
+    window.endContestUploadingPhase = async () => { await updateContestConfig(window.currentTopic, 'upload_ended'); showFeedbackMessage('만화 업로드가 종료되었습니다.'); };
+    window.startVotingPhase = async () => { await updateContestConfig(window.currentTopic, 'voting'); showFeedbackMessage('투표가 시작되었습니다!'); };
+    window.endVotingPhase = async () => { await updateContestConfig(window.currentTopic, 'results'); showFeedbackMessage('투표가 종료되었습니다! 결과를 발표합니다.'); };
+
+    window.resetContest = async () => {
+      if (!ensureLogin(true)) return;
+
+      const confirmed = await showConfirm('정말로 대전을 초기화하시겠습니까? 모든 만화와 좋아요 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.');
+      if (!confirmed) return;
+
+      loadingOverlay.classList.remove('hidden');
+      showFeedbackMessage('대전 초기화 중... 모든 데이터를 삭제합니다.');
+
+      try {
+        const refs = cloudRefs();
+        if (!refs) return;
+
+        // 1. Delete all comic documents
+        const deletePromises = [];
+        const comicsToDelete = [...window.comics]; // Copy the array
+        
+        comicsToDelete.forEach(comic => {
+          // Add Firebase Storage delete promises (best effort, don't block reset)
+          if (comic.images && Array.isArray(comic.images)) {
+            comic.images.forEach(img => {
+              if (img.path) {
+                deletePromises.push(deleteObject(storageRef(storage, img.path)).catch(e => console.warn("Storage 삭제 실패 (무시):", e)));
+              }
+            });
+          }
+          // Add Firestore document delete promise
+          deletePromises.push(deleteDoc(doc(refs.comicsCol, comic.id)));
+        });
+
+        await Promise.allSettled(deletePromises);
+        console.log('All comic data deleted.');
+
+        // 2. Reset the config document
+        await setDoc(refs.configDoc, {
+          topic: "",
+          status: "",
+          updatedAt: serverTimestamp()
+        });
+        
+        loadingOverlay.classList.add('hidden');
+        showFeedbackMessage('대전이 성공적으로 초기화되었습니다.');
+
+      } catch (e) {
+        loadingOverlay.classList.add('hidden');
+        showAlert('초기화 중 오류 발생: ' + e.message);
+      }
+    };
+
+    window.__unsubs=[];
+    async function setupRealtimeSync(){
+      const refs = cloudRefs();
+      if (!refs) return;
+      window.__unsubs.forEach(fn=>{ try{ fn(); }catch(_){} });
+      window.__unsubs=[];
+      const unsubConfig = onSnapshot(refs.configDoc, (doc) => {
+        const data = doc.data();
+        const status = data?.status || "";
+        const topic = data?.topic || "";
+        if(typeof handleTopicSet === 'function') { handleTopicSet(status, topic); }
+      }, (error) => {
+        console.error("Config 구독 오류:", error);
+        if (error.code === 'permission-denied') {
+          showAlert("데이터를 읽을 수 없습니다. Firestore 보안 규칙을 확인하세요. ('config' 컬렉션에 대한 'read: true' 설정 필요)");
+        }
+      });
+      window.__unsubs.push(unsubConfig);
+
+      const q = query(refs.comicsCol, orderBy("timestamp", "desc"), limit(100));
+      const unsubComics = onSnapshot(q, (snap) => {
+          window.comics = snap.docs.map(d=>({id:d.id,...d.data()}));
+          if(typeof renderComics === 'function') renderComics();
+      }, (error) => {
+        console.error("Comics 구독 오류:", error);
+        if (error.code === 'permission-denied') {
+          showAlert("데이터를 읽을 수 없습니다. Firestore 보안 규칙을 확인하세요. ('comics' 컬렉션에 대한 'read: true' 설정 필요)");
+        }
+      });
+      window.__unsubs.push(unsubComics);
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+  loadingOverlay.classList.remove('hidden');
+  window.isAuthReady=false;
+
+  if(user){
+    authBar.classList.remove('hidden');
+    userInfoEl.textContent = `${user.displayName || '로그인됨'}`;
+    signInBtn.classList.add('hidden');
+    signOutBtn.classList.remove('hidden');
+    await setupRealtimeSync();
+  } else {
+    authBar.classList.remove('hidden');
+    userInfoEl.textContent='로그인이 필요합니다.';
+    signOutBtn.classList.add('hidden');
+    signInBtn.classList.remove('hidden');
+
+    window.__unsubs.forEach(fn=>{ try{ fn(); }catch(_){} });
+    window.__unsubs=[];
+    window.comics=[];
+    if(typeof handleTopicSet === 'function') handleTopicSet("", "");
+  }
+
+  loadingOverlay.classList.add('hidden');
+  window.isAuthReady=true;
+  if(typeof handleTopicSet === 'function') {
+     handleTopicSet(window.currentContestStatus, window.currentTopic);
+  }
+});
+
+
+    (function init(){ attachEventListeners(); })();
+
+  </script>
+</body>
+</html>
