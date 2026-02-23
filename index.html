@@ -90,7 +90,6 @@
       max-width: 95vw; max-height: 92vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    /* 세련된 업로드 영역 디자인 */
     .custom-file-upload {
       border: 2px dashed #444;
       border-radius: 20px;
@@ -164,7 +163,6 @@
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 관리자 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
       <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
@@ -175,14 +173,12 @@
       <div class="mb-10 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Banner Image</label>
         <button id="triggerBannerBtn" class="w-full bg-gray-800 py-5 rounded-xl font-black border-2 border-dashed border-gray-700 text-gray-400 hover:text-white hover:border-blue-500 transition-all">UPLOAD JPG</button>
-        <!-- ✅ 수정: 브라우저 기본 파일 입력 숨김 처리 -->
         <input type="file" id="bannerFileInput" accept="image/*" class="hidden">
       </div>
       <div class="flex justify-center"><button id="closeSettingsModalBtn" class="bg-gray-800 px-12 py-3 rounded-2xl font-black text-gray-400 hover:text-white">CLOSE</button></div>
     </div>
   </div>
 
-  <!-- 작품 상세보기 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative bg-black border-none">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
@@ -191,7 +187,6 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-xl">
       <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
@@ -265,7 +260,7 @@
     const showLoading = (show, text = "Processing...") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
 
     const showAlert = (msg) => {
-      el('modal-message').textContent = msg;
+      el('modal-message').innerHTML = msg;
       el('alert-modal').style.display = 'flex';
       return new Promise(res => { el('modal-confirm-btn').onclick = () => { el('alert-modal').style.display = 'none'; res(); }; });
     };
@@ -297,7 +292,8 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${hasLiked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
               </svg>
-              <span>${hasLiked ? '완료' : '따봉'}</span>
+              <!-- ✅ FIX: '따봉'을 '좋아요'로 변경 -->
+              <span>${hasLiked ? '완료' : '좋아요'}</span>
             </button>
             <span class="like-count">${likes}</span>
           </div>
@@ -412,7 +408,6 @@
     
     customUploadBtn.onclick = () => uploadInput.click();
     
-    // ✅ 수정: 작품 업로드 드래그 앤 드롭 이벤트 구현
     customUploadBtn.addEventListener('dragover', (e) => {
       e.preventDefault();
       customUploadBtn.style.borderColor = '#3b82f6';
@@ -428,7 +423,7 @@
       customUploadBtn.style.background = '#222';
       const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
       if (droppedFiles.length > 0) {
-        state.files = [...state.files, ...droppedFiles]; // 기존 파일에 추가
+        state.files = [...state.files, ...droppedFiles];
         renderPreviews();
       }
     });
@@ -466,7 +461,8 @@
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
         await setDoc(ref, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: state.topic });
-        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 성공적으로 등록되었습니다!");
+        el('uploadModal').style.display = 'none'; state.files = []; 
+        showAlert("작품이 성공적으로<br>등록되었습니다!");
       } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
     };
 
