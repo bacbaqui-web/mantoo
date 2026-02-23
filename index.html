@@ -84,9 +84,9 @@
     #imagePreviewArea { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-      gap: 12px; 
+      gap: 16px; 
       margin-top: 1rem; 
-      padding: 12px; 
+      padding: 16px; 
       background: #1a1a1a; 
       border-radius: 8px; 
       min-height: 120px;
@@ -96,8 +96,7 @@
       position: relative; 
       width: 100%; 
       aspect-ratio: 1 / 1; 
-      border-radius: 10px;
-      overflow: hidden;
+      /* overflow: hidden; 삭제하여 버튼이 안 잘리게 함 */
     }
 
     .preview-image { 
@@ -105,12 +104,13 @@
       height: 100%; 
       object-fit: cover; 
       border-radius: 8px;
+      border: 1px solid #333;
     }
     
     .preview-number {
-      position: absolute; top: 4px; left: 4px; background: rgba(0, 0, 0, 0.7);
-      color: white; border-radius: 50%; width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; z-index: 5;
+      position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.7);
+      color: white; border-radius: 50%; width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 5;
     }
 
     .file-input-label { background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; display: block; }
@@ -164,7 +164,6 @@
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center">관리자 설정</h2>
@@ -196,7 +195,6 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-lg">
       <h2 class="text-2xl font-bold mb-6 text-center">작품 올리기</h2>
@@ -216,7 +214,6 @@
     </div>
   </div>
 
-  <!-- 비밀번호 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-xl font-bold mb-4">관리자 인증</h2>
@@ -229,14 +226,13 @@
     </div>
   </div>
 
-  <!-- 제시어 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
       <input type="text" id="topicInput" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-center mb-4" placeholder="대전 주제 입력">
       <div class="flex justify-center gap-2">
-        <button id="closeTopicModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg">취소</button>
-        <button id="submitTopicBtn" class="bg-slate-700 px-4 py-2 rounded-lg">시작</button>
+        <button id="closeTopicModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg font-bold">취소</button>
+        <button id="submitTopicBtn" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">시작</button>
       </div>
     </div>
   </div>
@@ -410,12 +406,8 @@
       });
     };
 
-    // --- 단순화된 미리보기 로직 (순서 변경 삭제) ---
     const imagePreviewArea = el('imagePreviewArea');
-    el('comicFilesInput').onchange = (e) => { 
-      uploadedFiles = Array.from(e.target.files); 
-      renderPreviews(); 
-    };
+    el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files); renderPreviews(); };
 
     const renderPreviews = () => {
       imagePreviewArea.innerHTML = '';
