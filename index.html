@@ -85,7 +85,15 @@
       max-width: 90vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    #imagePreviewArea { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 16px; margin-top: 1rem; padding: 16px; background: #1a1a1a; border-radius: 8px; }
+    #imagePreviewArea { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+      gap: 16px; 
+      margin-top: 1rem; 
+      padding: 16px; 
+      background: #1a1a1a; 
+      border-radius: 8px; 
+    }
     .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; }
     .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #333; }
     .preview-number {
@@ -96,20 +104,24 @@
 
     .file-input-label { background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; display: block; }
     #comicFilesInput, #bannerFileInput { display: none; }
+    
     .admin-button { background: #475569; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
     .admin-button:hover { background: #334155; }
+
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; }
   </style>
 </head>
 <body class="text-white">
 
+  <!-- 상단 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
     <span id="userInfo" class="text-sm opacity-80">데이터 동기화 중...</span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded hidden">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
 
+  <!-- 메인 타이틀 영역 -->
   <div class="w-full max-w-2xl flex items-center justify-center relative mb-6 px-12">
     <h1 id="mainTitleDisplay" class="text-4xl font-bold text-center text-white">만투</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-500 hover:text-white transition-colors hidden" title="관리자 설정">
@@ -137,27 +149,30 @@
       <button id="endVotingBtn" class="admin-button hidden">투표 종료 및 결과 발표</button>
       <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
     </section>
+    
     <div id="comic-grid"></div>
   </div>
 
   <!-- 설정 모달 -->
   <div id="settingsModal" class="modal">
-    <div class="modal-content w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-6 text-center">관리자 설정</h2>
-      <div class="mb-6">
+    <div class="modal-content w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-6">관리자 설정</h2>
+      
+      <div class="mb-6 text-left">
         <label class="block text-sm font-medium text-gray-300 mb-1">앱 타이틀 변경</label>
         <div class="flex gap-2">
           <input type="text" id="newTitleInput" class="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white" placeholder="예: 만투">
           <button id="saveTitleBtn" class="bg-slate-600 px-4 py-2 rounded-lg font-bold">변경</button>
         </div>
       </div>
-      <div class="mb-6">
+
+      <div class="mb-6 text-left">
         <label class="block text-sm font-medium text-gray-300 mb-1">배너 이미지 업로드</label>
         <button id="triggerBannerBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold border border-gray-600">파일 선택 및 업로드</button>
         <input type="file" id="bannerFileInput" accept="image/*">
       </div>
+
       <div class="mb-6 pt-4 border-t border-gray-700">
-        <label class="block text-sm font-medium text-gray-300 mb-1">데이터 관리</label>
         <button id="downloadAllComicsBtn" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -165,6 +180,7 @@
           모든 작품 다운로드 (.zip)
         </button>
       </div>
+
       <div class="flex justify-center mt-4">
         <button id="closeSettingsModalBtn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-8 rounded-lg">닫기</button>
       </div>
@@ -181,7 +197,6 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-lg">
       <h2 class="text-2xl font-bold mb-6 text-center">작품 올리기</h2>
@@ -201,7 +216,6 @@
     </div>
   </div>
 
-  <!-- 비밀번호 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-xl font-bold mb-4">관리자 인증</h2>
@@ -214,7 +228,6 @@
     </div>
   </div>
 
-  <!-- 제시어 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
@@ -226,21 +239,20 @@
     </div>
   </div>
 
-  <!-- 알림/로딩 -->
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-white text-lg mb-6"></p><div class="flex justify-center gap-3"><button id="modal-cancel-btn" class="px-5 py-2 bg-gray-600 rounded-md hidden">취소</button><button id="modal-confirm-btn" class="px-5 py-2 bg-slate-700 rounded-md">확인</button></div></div></div>
   <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-80 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div><p id="loading-text" class="text-white text-lg">데이터 처리 중...</p></div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, deleteDoc, collection, onSnapshot, addDoc, updateDoc, serverTimestamp, query, orderBy, limit, deleteField, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, setDoc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject, getBlob } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
       authDomain: "ne-cut-battle.firebaseapp.com",
       projectId: "ne-cut-battle",
-      storageBucket: "ne-cut-battle.firebasestorage.app",
+      storageBucket: "ne-cut-battle.firebasestorage.app", 
       messagingSenderId: "565872837701",
       appId: "1:565872837701:web:3c57c4bab8d37644018f2c"
     };
@@ -272,15 +284,6 @@
       });
     };
 
-    const updateAuthUI = (user) => {
-      const isMgr = user && !user.isAnonymous;
-      el('userInfo').textContent = user ? user.displayName : "비로그인 상태 (결과 보기 가능)";
-      el('signInBtn').classList.toggle('hidden', !!user);
-      el('signOutBtn').classList.toggle('hidden', !user);
-      el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      refreshButtons();
-    };
-
     const refreshButtons = () => {
       const isMgr = auth.currentUser && !auth.currentUser.isAnonymous;
       el('startContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "");
@@ -296,7 +299,8 @@
       let displayData = [...comics];
       if (currentTopic) { displayData = displayData.filter(c => c.topic === currentTopic); }
       if (currentStatus === 'results') { displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length); }
-      if (displayData.length === 0) { grid.innerHTML = '<p class="col-span-full py-20 opacity-50 text-center">등록된 작품이 없습니다.</p>'; return; }
+      if (displayData.length === 0) { grid.innerHTML = '<p class="col-span-full py-20 opacity-50 text-center w-full">등록된 작품이 없습니다.</p>'; return; }
+      
       displayData.forEach((comic, idx) => {
         const likes = Object.keys(comic.likes || {}).length;
         const hasLiked = auth.currentUser && comic.likes?.[auth.currentUser.uid];
@@ -371,10 +375,8 @@
     };
 
     el('confirmPasswordBtn').onclick = () => {
-      if (el('generalPasswordInput').value === ADMIN_PW) { 
-        el('generalPasswordModal').style.display = 'none'; 
-        if (pendingAction) { pendingAction(); pendingAction = null; } 
-      } else el('passwordErrorMessage').textContent = "틀렸습니다.";
+      if (el('generalPasswordInput').value === ADMIN_PW) { el('generalPasswordModal').style.display = 'none'; if (pendingAction) { pendingAction(); pendingAction = null; } }
+      else el('passwordErrorMessage').textContent = "틀렸습니다.";
     };
 
     const resizeImage = (file, maxWidth = 1280, quality = 0.8) => {
@@ -398,6 +400,7 @@
 
     el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files); renderPreviews(); };
     const renderPreviews = () => {
+      const imagePreviewArea = el('imagePreviewArea');
       imagePreviewArea.innerHTML = '';
       if (uploadedFiles.length === 0) { imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-8 text-center w-full">이미지를 선택해주세요.</p>'; return; }
       uploadedFiles.forEach((file, i) => {
@@ -452,30 +455,35 @@
       showLoading(false);
     };
 
+    // --- 개편된 모든 작품 다운로드 로직 ---
     el('downloadAllComicsBtn').onclick = async () => {
       if (comics.length === 0) return showAlert("다운로드할 작품이 없습니다.");
-      showLoading(true, "작품 수집 및 압축 중... (CORS 설정이 필요할 수 있습니다)");
+      showLoading(true, "작품 수집 중... (터미널 CORS 설정 필수)");
       const zip = new JSZip();
+      
       try {
         for (const comic of comics) {
-          const folderName = comic.uploaderName.replace(/[/\\?%*:|"<>]/g, '-'); 
-          const folder = zip.folder(folderName);
+          // 파일명에 쓸 수 없는 특수문자 제거
+          const safeName = comic.uploaderName.replace(/[/\\?%*:|"<>]/g, '-');
+          const folder = zip.folder(safeName);
+          
           for (let i = 0; i < comic.images.length; i++) {
             const imgData = comic.images[i];
-            let blob;
             try {
-              if (imgData.path) { blob = await getBlob(storageRef(storage, imgData.path)); } 
-              else { const resp = await fetch(imgData.imageUrl); if (!resp.ok) throw new Error(); blob = await resp.blob(); }
+              // Storage SDK의 getBlob을 사용하여 직접 데이터를 가져옵니다.
+              const blob = await getBlob(storageRef(storage, imgData.path));
               folder.file(`${i + 1}.jpg`, blob);
-            } catch (err) { console.warn(`이미지 다운로드 실패: ${imgData.imageUrl}`); }
+            } catch (err) {
+              console.error(`다운로드 실패 (${comic.uploaderName}):`, err);
+            }
           }
         }
         const content = await zip.generateAsync({ type: "blob" });
-        saveAs(content, `만투_모든작품_${new Date().toLocaleDateString()}.zip`);
-        showAlert("다운로드가 완료되었습니다.");
+        saveAs(content, `만투_전체작품_${new Date().toLocaleDateString()}.zip`);
+        showAlert("다운로드가 완료되었습니다!");
       } catch (e) {
-        console.error("Download Error:", e);
-        showAlert("다운로드 중 오류가 발생했습니다. 터미널에서 CORS 설정을 완료했는지 확인해주세요.");
+        console.error("ZIP Error:", e);
+        showAlert("오류가 발생했습니다. 구글 클라우드 터미널 설정을 확인해 주세요.");
       }
       showLoading(false);
     };
@@ -500,7 +508,18 @@
     };
 
     setupSync();
-    onAuthStateChanged(auth, updateAuthUI);
+    onAuthStateChanged(auth, (user) => {
+      updateAuthUI(user);
+      if (user) {
+        // 로그인된 경우 버튼 상태만 갱신
+        refreshButtons();
+      } else {
+        // 로그아웃 시 초기화
+        currentStatus = ""; currentTopic = ""; comics = []; 
+        renderComics();
+      }
+    });
+
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
     el('showUploadModalBtn').onclick = () => { uploadedFiles = []; el('imagePreviewArea').innerHTML = ''; el('uploadModal').style.display = 'flex'; };
