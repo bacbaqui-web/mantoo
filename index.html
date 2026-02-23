@@ -153,10 +153,7 @@
 
   <div id="comics-section" class="w-full max-w-6xl">
     <section class="text-center mb-12 flex flex-wrap justify-center gap-5">
-      <!-- 💡 '대전 시작' 버튼: 관리자 전용 -->
       <button id="startContestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">대전 시작하기</button>
-      
-      <!-- 💡 상태별 버튼들 -->
       <button id="showUploadModalBtn" class="bg-white hover:bg-gray-200 text-black font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">+ 작품 업로드</button>
       <button id="endContestBtn" class="admin-button hidden">업로드 마감</button>
       <button id="startVotingBtn" class="admin-button hidden">투표 시작</button>
@@ -164,7 +161,6 @@
       <button id="resetContestBtn" class="admin-button hidden text-red-400">데이터 초기화</button>
     </section>
 
-    <!-- 작품 그리드 -->
     <div id="comic-grid"></div>
   </div>
 
@@ -179,7 +175,8 @@
       <div class="mb-10 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Banner Image</label>
         <button id="triggerBannerBtn" class="w-full bg-gray-800 py-5 rounded-xl font-black border-2 border-dashed border-gray-700 text-gray-400 hover:text-white hover:border-blue-500 transition-all">UPLOAD JPG</button>
-        <input type="file" id="bannerFileInput" accept="image/*">
+        <!-- ✅ 수정: 브라우저 기본 파일 입력 숨김 처리 -->
+        <input type="file" id="bannerFileInput" accept="image/*" class="hidden">
       </div>
       <div class="flex justify-center"><button id="closeSettingsModalBtn" class="bg-gray-800 px-12 py-3 rounded-2xl font-black text-gray-400 hover:text-white">CLOSE</button></div>
     </div>
@@ -194,7 +191,7 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 (요청하신 업로드 영역 업그레이드) -->
+  <!-- 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-xl">
       <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
@@ -204,7 +201,6 @@
       </div>
       <div class="mb-4">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Select Comics</label>
-        <!-- 💡 커스텀 파일 업로드 영역 -->
         <div id="customFileUpload" class="custom-file-upload">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -222,7 +218,6 @@
     </div>
   </div>
 
-  <!-- 관리자 인증 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-2xl font-black mb-8">VERIFICATION</h2>
@@ -239,7 +234,6 @@
     </div>
   </div>
 
-  <!-- 알림/로딩 -->
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black">확인</button></div></div>
   <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
 
@@ -280,24 +274,19 @@
       const grid = el('comic-grid'); grid.innerHTML = '';
       let list = [...state.comics];
       if (state.topic) list = list.filter(c => c.topic === state.topic);
-      
       if (state.status === 'results') {
         list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
       }
-
       if (list.length === 0) return;
-
       list.forEach((c, i) => {
         const likes = Object.keys(c.likes || {}).length;
         const hasLiked = auth.currentUser && c.likes?.[auth.currentUser.uid];
         const isOwner = auth.currentUser && c.uploaderId === auth.currentUser.uid;
-        
         let rankClass = "", medal = "";
         if (state.status === 'results' && i < 3) {
           rankClass = `rank-${i + 1}`; 
           medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
         }
-
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
         card.innerHTML = `
@@ -314,7 +303,6 @@
           </div>
           ${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs">✕</button>` : ''}
         `;
-        
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
           if (state.status === 'uploading') return showAlert('마감 후에 작품이 공개됩니다.');
@@ -369,16 +357,12 @@
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
       el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-
-      // ✅ FIX: 익명 로그인(user는 있음) 상태에서도 LOGIN 버튼은 보여야 구글 로그인으로 전환 가능
       el('signInBtn').classList.toggle('hidden', !!user && !user.isAnonymous);
       el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
-      // ✅ FIX: 익명도 투표 가능했던 부분 차단 (구글 로그인 필요)
       if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
-
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
       if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만 할 수 있습니다!");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
@@ -411,13 +395,10 @@
           img.onload = () => {
             const canvas = document.createElement('canvas');
             let w = img.width, h = img.height;
-
-            // ✅ FIX: width/height 미정의 변수 사용 버그 수정
             if (w > maxWidth) { 
               h = Math.round((h * maxWidth) / w);
               w = maxWidth; 
             }
-
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
             canvas.toBlob((b) => res(b.size < file.size ? b : file), 'image/jpeg', quality);
@@ -426,12 +407,36 @@
       });
     };
 
-    // 💡 이미지 업로드 영역 상호작용
     const uploadInput = el('comicFilesInput');
     const customUploadBtn = el('customFileUpload');
     
     customUploadBtn.onclick = () => uploadInput.click();
-    uploadInput.onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
+    
+    // ✅ 수정: 작품 업로드 드래그 앤 드롭 이벤트 구현
+    customUploadBtn.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      customUploadBtn.style.borderColor = '#3b82f6';
+      customUploadBtn.style.background = '#262626';
+    });
+    customUploadBtn.addEventListener('dragleave', () => {
+      customUploadBtn.style.borderColor = '#444';
+      customUploadBtn.style.background = '#222';
+    });
+    customUploadBtn.addEventListener('drop', (e) => {
+      e.preventDefault();
+      customUploadBtn.style.borderColor = '#444';
+      customUploadBtn.style.background = '#222';
+      const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      if (droppedFiles.length > 0) {
+        state.files = [...state.files, ...droppedFiles]; // 기존 파일에 추가
+        renderPreviews();
+      }
+    });
+
+    uploadInput.onchange = (e) => { 
+      state.files = Array.from(e.target.files); 
+      renderPreviews(); 
+    };
 
     const renderPreviews = () => {
       const area = el('imagePreviewArea'); area.innerHTML = '';
@@ -445,12 +450,10 @@
     };
 
     el('submitComicBtn').onclick = async () => {
-      // ✅ FIX: 업로드는 구글 로그인 필요(익명 업로드 방지)
       if (!auth.currentUser || auth.currentUser.isAnonymous) {
         await showAlert("업로드하려면 구글 로그인이 필요합니다.");
         return;
       }
-
       const name = el('uploadNickname').value.trim(); 
       if (!name || state.files.length === 0) return showAlert("닉네임과 작품 사진을 확인해 주세요.");
       showLoading(true, "Processing...");
@@ -505,10 +508,9 @@
       }; showPasswordModal("데이터 초기화");
     };
 
-    // 💡 초기화 로직
     const initApp = async () => {
       try {
-        await signInAnonymously(auth); // 💡 규칙 준수: 쿼리 전 인증 호출
+        await signInAnonymously(auth);
       } catch (e) { console.error("Auth error:", e); }
       setupSync();
     };
