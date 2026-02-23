@@ -6,7 +6,7 @@
   <title>만투 - 네컷만화 투표</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"/>
-  <!-- 압축 및 파일 저장을 위한 라이브러리 추가 -->
+  <!-- 압축 및 파일 저장을 위한 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
@@ -50,7 +50,6 @@
       border: 3px solid transparent; 
     }
     .comic-card.disabled { cursor: not-allowed; opacity: 0.7; }
-    
     .comic-card.rank-1 { border-color: #FFD700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
     .comic-card.rank-2 { border-color: #C0C0C0; }
     .comic-card.rank-3 { border-color: #CD7F32; }
@@ -86,16 +85,7 @@
       max-width: 90vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    #imagePreviewArea { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-      gap: 16px; 
-      margin-top: 1rem; 
-      padding: 16px; 
-      background: #1a1a1a; 
-      border-radius: 8px; 
-    }
-    
+    #imagePreviewArea { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 16px; margin-top: 1rem; padding: 16px; background: #1a1a1a; border-radius: 8px; }
     .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; }
     .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #333; }
     .preview-number {
@@ -106,24 +96,20 @@
 
     .file-input-label { background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; display: block; }
     #comicFilesInput, #bannerFileInput { display: none; }
-    
     .admin-button { background: #475569; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
     .admin-button:hover { background: #334155; }
-
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; }
   </style>
 </head>
 <body class="text-white">
 
-  <!-- 상단 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
     <span id="userInfo" class="text-sm opacity-80">데이터 동기화 중...</span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded hidden">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
 
-  <!-- 메인 타이틀 영역 -->
   <div class="w-full max-w-2xl flex items-center justify-center relative mb-6 px-12">
     <h1 id="mainTitleDisplay" class="text-4xl font-bold text-center text-white">만투</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-500 hover:text-white transition-colors hidden" title="관리자 설정">
@@ -151,7 +137,6 @@
       <button id="endVotingBtn" class="admin-button hidden">투표 종료 및 결과 발표</button>
       <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
     </section>
-    
     <div id="comic-grid"></div>
   </div>
 
@@ -159,8 +144,6 @@
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center">관리자 설정</h2>
-      
-      <!-- 앱 타이틀 변경 -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-300 mb-1">앱 타이틀 변경</label>
         <div class="flex gap-2">
@@ -168,15 +151,11 @@
           <button id="saveTitleBtn" class="bg-slate-600 px-4 py-2 rounded-lg font-bold">변경</button>
         </div>
       </div>
-
-      <!-- 배너 이미지 업로드 -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-300 mb-1">배너 이미지 업로드</label>
         <button id="triggerBannerBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold border border-gray-600">파일 선택 및 업로드</button>
         <input type="file" id="bannerFileInput" accept="image/*">
       </div>
-
-      <!-- 신규 기능: 모든 작품 다운로드 -->
       <div class="mb-6 pt-4 border-t border-gray-700">
         <label class="block text-sm font-medium text-gray-300 mb-1">데이터 관리</label>
         <button id="downloadAllComicsBtn" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
@@ -185,16 +164,13 @@
           </svg>
           모든 작품 다운로드 (.zip)
         </button>
-        <p class="text-xs text-gray-500 mt-2 text-center">작가 이름별로 폴더를 생성하여 이미지를 수집합니다.</p>
       </div>
-
       <div class="flex justify-center mt-4">
         <button id="closeSettingsModalBtn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-8 rounded-lg">닫기</button>
       </div>
     </div>
   </div>
 
-  <!-- 작품 확대 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative">
       <button id="closeImageModalBtn" class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 z-50">
@@ -258,7 +234,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, deleteDoc, collection, onSnapshot, addDoc, updateDoc, serverTimestamp, query, orderBy, limit, deleteField, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject, getBlob } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
@@ -318,50 +294,20 @@
     const renderComics = () => {
       const grid = el('comic-grid'); grid.innerHTML = '';
       let displayData = [...comics];
-      if (currentTopic) {
-        displayData = displayData.filter(c => c.topic === currentTopic);
-      }
-      
-      if (currentStatus === 'results') {
-        displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
-      }
-
-      if (displayData.length === 0) {
-        grid.innerHTML = '<p class="col-span-full py-20 opacity-50 text-center">등록된 작품이 없습니다.</p>';
-        return;
-      }
-
+      if (currentTopic) { displayData = displayData.filter(c => c.topic === currentTopic); }
+      if (currentStatus === 'results') { displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length); }
+      if (displayData.length === 0) { grid.innerHTML = '<p class="col-span-full py-20 opacity-50 text-center">등록된 작품이 없습니다.</p>'; return; }
       displayData.forEach((comic, idx) => {
         const likes = Object.keys(comic.likes || {}).length;
         const hasLiked = auth.currentUser && comic.likes?.[auth.currentUser.uid];
         const isOwner = auth.currentUser && comic.uploaderId === auth.currentUser.uid;
-        
         let rankClass = "", medal = "";
         if (currentStatus === 'results' && idx < 3 && likes > 0) {
-          rankClass = `rank-${idx + 1}`; 
-          medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][idx]}</div>`;
+          rankClass = `rank-${idx + 1}`; medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][idx]}</div>`;
         }
-
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${currentStatus === 'uploading' ? 'disabled' : ''}`;
-        card.innerHTML = `
-          ${medal}
-          <div class="content">
-            <span class="nickname-display">${comic.uploaderName}</span>
-            <span class="sub-text">${comic.images?.length || 0}컷 작품</span>
-          </div>
-          <div class="info-footer">
-            <div class="like-section">
-              <button class="like-btn ${hasLiked ? 'liked' : ''} ${currentStatus !== 'voting' ? 'disabled' : ''}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg>
-                <span>따봉</span>
-              </button>
-              <span class="like-count">${likes}</span>
-            </div>
-          </div>
-          ${isOwner && currentStatus !== 'results' ? `<button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-btn">✕</button>` : ''}
-        `;
-        
+        card.innerHTML = `${medal}<div class="content"><span class="nickname-display">${comic.uploaderName}</span><span class="sub-text">${comic.images?.length || 0}컷 작품</span></div><div class="info-footer"><div class="like-section"><button class="like-btn ${hasLiked ? 'liked' : ''} ${currentStatus !== 'voting' ? 'disabled' : ''}"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg><span>따봉</span></button><span class="like-count">${likes}</span></div></div>${isOwner && currentStatus !== 'results' ? `<button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-btn">✕</button>` : ''}`;
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
           if (currentStatus === 'uploading') return showAlert('업로드 마감 후에 볼 수 있습니다.');
@@ -385,29 +331,18 @@
     const setupSync = () => {
       onSnapshot(doc(db, `artifacts/${APP_ID}/public/data/config/current`), (d) => {
         const data = d.data(); if (!data) return;
-        currentStatus = data.status || ""; 
-        currentTopic = data.topic || "";
+        currentStatus = data.status || ""; currentTopic = data.topic || "";
         el('mainTitleDisplay').textContent = data.appTitle || "만투";
         document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
-        
-        if (data.bannerUrl && currentStatus === "") { 
-          el('mainBanner').src = data.bannerUrl; 
-          el('mainBanner').classList.remove('hidden'); 
-        } else { 
-          el('mainBanner').classList.add('hidden'); 
-        }
-
+        if (data.bannerUrl && currentStatus === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
+        else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = currentTopic;
         el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
         refreshButtons();
         renderComics();
       });
-
       const q = query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snap) => { 
-        comics = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
-        renderComics(); 
-      });
+      onSnapshot(q, (snap) => { comics = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderComics(); });
     };
 
     const toggleLike = async (id) => {
@@ -444,8 +379,7 @@
 
     const resizeImage = (file, maxWidth = 1280, quality = 0.8) => {
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+        const reader = new FileReader(); reader.readAsDataURL(file);
         reader.onload = (event) => {
           const img = new Image(); img.src = event.target.result;
           img.onload = () => {
@@ -462,20 +396,14 @@
       });
     };
 
-    const imagePreviewArea = el('imagePreviewArea');
     el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files); renderPreviews(); };
-
     const renderPreviews = () => {
       imagePreviewArea.innerHTML = '';
       if (uploadedFiles.length === 0) { imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-8 text-center w-full">이미지를 선택해주세요.</p>'; return; }
       uploadedFiles.forEach((file, i) => {
         const div = document.createElement('div');
         div.className = 'preview-container';
-        div.innerHTML = `
-          <span class="preview-number">${i+1}</span>
-          <img src="${URL.createObjectURL(file)}" class="preview-image">
-          <button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg">✕</button>
-        `;
+        div.innerHTML = `<span class="preview-number">${i+1}</span><img src="${URL.createObjectURL(file)}" class="preview-image"><button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg">✕</button>`;
         div.querySelector('button').onclick = (e) => { e.stopPropagation(); uploadedFiles.splice(i, 1); renderPreviews(); };
         imagePreviewArea.appendChild(div);
       });
@@ -524,42 +452,30 @@
       showLoading(false);
     };
 
-    // --- 신규 기능: 모든 작품 다운로드 로직 ---
     el('downloadAllComicsBtn').onclick = async () => {
       if (comics.length === 0) return showAlert("다운로드할 작품이 없습니다.");
-      
-      showLoading(true, "작품 수집 및 압축 중...");
+      showLoading(true, "작품 수집 및 압축 중... (CORS 설정이 필요할 수 있습니다)");
       const zip = new JSZip();
-      
       try {
-        // 이미지를 Blob으로 변환하여 zip에 추가하는 함수
-        const fetchImageAsBlob = async (url) => {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`이미지를 불러올 수 없습니다: ${url}`);
-          return await response.blob();
-        };
-
-        // 작가별 폴더 구조 생성
         for (const comic of comics) {
-          const folderName = comic.uploaderName.replace(/[/\\?%*:|"<>]/g, '-'); // 파일명 사용 불가능 문자 치환
+          const folderName = comic.uploaderName.replace(/[/\\?%*:|"<>]/g, '-'); 
           const folder = zip.folder(folderName);
-          
-          const imagePromises = comic.images.map(async (img, index) => {
-            const blob = await fetchImageAsBlob(img.imageUrl);
-            const ext = "jpg"; // 기본적으로 jpg로 저장
-            folder.file(`${index + 1}.${ext}`, blob);
-          });
-          
-          await Promise.all(imagePromises);
+          for (let i = 0; i < comic.images.length; i++) {
+            const imgData = comic.images[i];
+            let blob;
+            try {
+              if (imgData.path) { blob = await getBlob(storageRef(storage, imgData.path)); } 
+              else { const resp = await fetch(imgData.imageUrl); if (!resp.ok) throw new Error(); blob = await resp.blob(); }
+              folder.file(`${i + 1}.jpg`, blob);
+            } catch (err) { console.warn(`이미지 다운로드 실패: ${imgData.imageUrl}`); }
+          }
         }
-
-        // 압축 파일 생성 및 저장
         const content = await zip.generateAsync({ type: "blob" });
         saveAs(content, `만투_모든작품_${new Date().toLocaleDateString()}.zip`);
-        showAlert("다운로드가 시작되었습니다.");
+        showAlert("다운로드가 완료되었습니다.");
       } catch (e) {
         console.error("Download Error:", e);
-        showAlert("다운로드 중 오류가 발생했습니다. (CORS 설정 확인 필요)");
+        showAlert("다운로드 중 오류가 발생했습니다. 터미널에서 CORS 설정을 완료했는지 확인해주세요.");
       }
       showLoading(false);
     };
@@ -585,7 +501,6 @@
 
     setupSync();
     onAuthStateChanged(auth, updateAuthUI);
-
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
     el('showUploadModalBtn').onclick = () => { uploadedFiles = []; el('imagePreviewArea').innerHTML = ''; el('uploadModal').style.display = 'flex'; };
