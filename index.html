@@ -38,8 +38,8 @@
       transition: all .2s ease-in-out; 
       background: #333; 
       border-radius: 12px; 
-      overflow: hidden; 
-      margin-bottom: 1rem; 
+      overflow: visible; /* 메달과 X버튼이 튀어나올 수 있게 수정 */
+      margin-bottom: 1.5rem; 
       break-inside: avoid; 
       width: 100%; 
       display: block; 
@@ -47,23 +47,26 @@
       border: 3px solid transparent; 
     }
     .comic-card.disabled { cursor: not-allowed; opacity: 0.7; }
-    .comic-card.rank-1 { border-color: #FFD700; }
+    
+    /* 랭킹 테두리 강조 */
+    .comic-card.rank-1 { border-color: #FFD700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
     .comic-card.rank-2 { border-color: #C0C0C0; }
     .comic-card.rank-3 { border-color: #CD7F32; }
     
     .rank-medal { 
-      position: absolute; top: 8px; left: 8px; font-size: 1.8rem; line-height: 1; 
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 10; 
+      position: absolute; top: -10px; left: -10px; font-size: 2.5rem; line-height: 1; 
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 50; 
     }
     .comic-card:not(.disabled):hover { transform: translateY(-5px); background: #444; }
     
     .comic-card .content { 
       display: flex; flex-direction: column; justify-content: center; align-items: center; 
-      width: 100%; min-height: 120px; padding: 16px; text-align: center; background-color: #1a1a1a; position: relative; 
+      width: 100%; min-height: 120px; padding: 16px; text-align: center; background-color: #1a1a1a; 
+      position: relative; border-radius: 9px 9px 0 0;
     }
     .comic-card .nickname-display { font-size: 1.25rem; font-weight: 700; color: #fff; word-break: break-all; }
     .comic-card .sub-text { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
-    .comic-card .info-footer { padding: 12px; background: #333; text-align: left; }
+    .comic-card .info-footer { padding: 12px; background: #333; text-align: left; border-radius: 0 0 9px 9px; }
     
     .like-btn { 
       display: flex; align-items: center; gap: 6px; background: #555; color: white; 
@@ -89,24 +92,10 @@
       padding: 16px; 
       background: #1a1a1a; 
       border-radius: 8px; 
-      min-height: 120px;
     }
     
-    .preview-container { 
-      position: relative; 
-      width: 100%; 
-      aspect-ratio: 1 / 1; 
-      /* overflow: hidden; 삭제하여 버튼이 안 잘리게 함 */
-    }
-
-    .preview-image { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      border-radius: 8px;
-      border: 1px solid #333;
-    }
-    
+    .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; }
+    .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #333; }
     .preview-number {
       position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.7);
       color: white; border-radius: 50%; width: 20px; height: 20px;
@@ -127,7 +116,7 @@
 
   <!-- 상단 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
-    <span id="userInfo" class="text-sm opacity-80">연결 확인 중...</span>
+    <span id="userInfo" class="text-sm opacity-80">데이터 동기화 중...</span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded hidden">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
@@ -164,6 +153,7 @@
     <div id="comic-grid"></div>
   </div>
 
+  <!-- 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center">관리자 설정</h2>
@@ -185,6 +175,7 @@
     </div>
   </div>
 
+  <!-- 작품 확대 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative">
       <button id="closeImageModalBtn" class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 z-50">
@@ -195,6 +186,7 @@
     </div>
   </div>
 
+  <!-- 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-lg">
       <h2 class="text-2xl font-bold mb-6 text-center">작품 올리기</h2>
@@ -214,6 +206,7 @@
     </div>
   </div>
 
+  <!-- 비밀번호 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-xl font-bold mb-4">관리자 인증</h2>
@@ -226,6 +219,7 @@
     </div>
   </div>
 
+  <!-- 제시어 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
@@ -237,6 +231,7 @@
     </div>
   </div>
 
+  <!-- 알림/로딩 -->
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-white text-lg mb-6"></p><div class="flex justify-center gap-3"><button id="modal-cancel-btn" class="px-5 py-2 bg-gray-600 rounded-md hidden">취소</button><button id="modal-confirm-btn" class="px-5 py-2 bg-slate-700 rounded-md">확인</button></div></div></div>
   <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-80 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div><p id="loading-text" class="text-white text-lg">데이터 처리 중...</p></div></div>
 
@@ -264,7 +259,7 @@
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
-    let currentStatus = "", currentTopic = "", comics = [], uploadedFiles = [], dragStartIndex = null, pendingAction = null;
+    let currentStatus = "", currentTopic = "", comics = [], uploadedFiles = [], pendingAction = null;
 
     const el = (id) => document.getElementById(id);
     const showLoading = (show, text = "데이터 처리 중...") => {
@@ -284,29 +279,71 @@
 
     const updateAuthUI = (user) => {
       const isMgr = user && !user.isAnonymous;
-      el('userInfo').textContent = user ? user.displayName : "로그인 필요";
+      el('userInfo').textContent = user ? user.displayName : "비로그인 상태 (결과 보기 가능)";
       el('signInBtn').classList.toggle('hidden', !!user);
       el('signOutBtn').classList.toggle('hidden', !user);
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      handleTopicSet(currentStatus, currentTopic);
+      refreshButtons();
+    };
+
+    const refreshButtons = () => {
+      const isMgr = auth.currentUser && !auth.currentUser.isAnonymous;
+      el('startContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "");
+      el('showUploadModalBtn').classList.toggle('hidden', !isMgr || currentStatus !== "uploading");
+      el('endContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "uploading");
+      el('startVotingBtn').classList.toggle('hidden', !isMgr || currentStatus !== "upload_ended");
+      el('endVotingBtn').classList.toggle('hidden', !isMgr || currentStatus !== "voting");
+      el('resetContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "results");
     };
 
     const renderComics = () => {
       const grid = el('comic-grid'); grid.innerHTML = '';
-      const displayData = [...comics];
-      if (currentStatus === 'results') displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
       
+      // 현재 주제와 맞는 작품만 필터링 (결과 발표 시 더 정확하게 보여주기 위함)
+      let displayData = [...comics];
+      if (currentTopic) {
+        displayData = displayData.filter(c => c.topic === currentTopic);
+      }
+      
+      if (currentStatus === 'results') {
+        displayData.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
+      }
+
+      if (displayData.length === 0) {
+        grid.innerHTML = '<p class="col-span-full py-20 opacity-50 text-center">등록된 작품이 없습니다.</p>';
+        return;
+      }
+
       displayData.forEach((comic, idx) => {
         const likes = Object.keys(comic.likes || {}).length;
         const hasLiked = auth.currentUser && comic.likes?.[auth.currentUser.uid];
         const isOwner = auth.currentUser && comic.uploaderId === auth.currentUser.uid;
+        
         let rankClass = "", medal = "";
         if (currentStatus === 'results' && idx < 3 && likes > 0) {
-          rankClass = `rank-${idx + 1}`; medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][idx]}</div>`;
+          rankClass = `rank-${idx + 1}`; 
+          medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][idx]}</div>`;
         }
+
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${currentStatus === 'uploading' ? 'disabled' : ''}`;
-        card.innerHTML = `${medal}<div class="content"><span class="nickname-display">${comic.uploaderName}</span><span class="sub-text">${comic.images?.length || 0}컷</span></div><div class="info-footer"><div class="like-section"><button class="like-btn ${hasLiked ? 'liked' : ''} ${currentStatus !== 'voting' ? 'disabled' : ''}"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg><span>좋아요</span></button><span class="like-count">${likes}</span></div></div>${isOwner && currentStatus !== 'results' ? `<button class="absolute top-2 right-2 text-red-400 p-1 bg-black bg-opacity-30 rounded-full delete-btn">✕</button>` : ''}`;
+        card.innerHTML = `
+          ${medal}
+          <div class="content">
+            <span class="nickname-display">${comic.uploaderName}</span>
+            <span class="sub-text">${comic.images?.length || 0}컷 작품</span>
+          </div>
+          <div class="info-footer">
+            <div class="like-section">
+              <button class="like-btn ${hasLiked ? 'liked' : ''} ${currentStatus !== 'voting' ? 'disabled' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.333v5.167c0 .83.682 1.5 1.502 1.5h6.666A1.5 1.5 0 0015.5 15.5V8.167A1.5 1.5 0 0014 6.667h-2.167A2.5 2.5 0 009.5 4.5V3.083A1.5 1.5 0 008 1.583 1.5 1.5 0 006.5 3v7.333z"/></svg>
+                <span>따봉</span>
+              </button>
+              <span class="like-count">${likes}</span>
+            </div>
+          </div>
+          ${isOwner && currentStatus !== 'results' ? `<button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-btn">✕</button>` : ''}
+        `;
         
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
@@ -315,24 +352,10 @@
           openViewer(comic);
         };
         card.querySelector('.like-btn').onclick = (e) => { e.stopPropagation(); if (currentStatus === 'voting') toggleLike(comic.id); else showAlert('투표 기간이 아닙니다.'); };
-        if (isOwner) card.querySelector('.delete-btn').onclick = (e) => { e.stopPropagation(); handleDelete(comic.id); };
+        const del = card.querySelector('.delete-btn');
+        if (del) del.onclick = (e) => { e.stopPropagation(); handleDelete(comic.id); };
         grid.appendChild(card);
       });
-    };
-
-    const handleTopicSet = (status, topic) => {
-      currentStatus = status || "";
-      currentTopic = topic || "";
-      const isMgr = auth.currentUser && !auth.currentUser.isAnonymous;
-      el('startContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "");
-      el('showUploadModalBtn').classList.toggle('hidden', !isMgr || currentStatus !== "uploading");
-      el('endContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "uploading");
-      el('startVotingBtn').classList.toggle('hidden', !isMgr || currentStatus !== "upload_ended");
-      el('endVotingBtn').classList.toggle('hidden', !isMgr || currentStatus !== "voting");
-      el('resetContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "results");
-      el('currentTopicText').textContent = currentTopic;
-      el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
-      renderComics();
     };
 
     const openViewer = (comic) => {
@@ -342,22 +365,39 @@
       el('imageModal').style.display = 'flex';
     };
 
+    // 실시간 동기화 설정 (로그인 전에도 실행되도록 수정)
     const setupSync = () => {
+      // 설정 정보 구독
       onSnapshot(doc(db, `artifacts/${APP_ID}/public/data/config/current`), (d) => {
         const data = d.data(); if (!data) return;
+        currentStatus = data.status || ""; 
+        currentTopic = data.topic || "";
         el('mainTitleDisplay').textContent = data.appTitle || "만투";
         document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
-        const status = data.status || "";
-        const topic = data.topic || "";
-        if (data.bannerUrl && status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
-        else { el('mainBanner').classList.add('hidden'); }
-        handleTopicSet(status, topic);
+        
+        if (data.bannerUrl && currentStatus === "") { 
+          el('mainBanner').src = data.bannerUrl; 
+          el('mainBanner').classList.remove('hidden'); 
+        } else { 
+          el('mainBanner').classList.add('hidden'); 
+        }
+
+        el('currentTopicText').textContent = currentTopic;
+        el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
+        refreshButtons();
+        renderComics();
       });
+
+      // 만화 데이터 구독
       const q = query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snap) => { comics = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderComics(); });
+      onSnapshot(q, (snap) => { 
+        comics = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
+        renderComics(); 
+      });
     };
 
     const toggleLike = async (id) => {
+      if (!auth.currentUser) return showAlert("로그인이 필요합니다.");
       const comic = comics.find(c => c.id === id); const uid = auth.currentUser.uid;
       const userHasLikedAny = comics.some(c => c.id !== id && c.likes?.[uid]);
       if (!comic.likes?.[uid] && userHasLikedAny) return showAlert("투표는 한 작품에만 가능합니다!");
@@ -382,8 +422,10 @@
     };
 
     el('confirmPasswordBtn').onclick = () => {
-      if (el('generalPasswordInput').value === ADMIN_PW) { el('generalPasswordModal').style.display = 'none'; if (pendingAction) { pendingAction(); pendingAction = null; } }
-      else el('passwordErrorMessage').textContent = "틀렸습니다.";
+      if (el('generalPasswordInput').value === ADMIN_PW) { 
+        el('generalPasswordModal').style.display = 'none'; 
+        if (pendingAction) { pendingAction(); pendingAction = null; } 
+      } else el('passwordErrorMessage').textContent = "틀렸습니다.";
     };
 
     const resizeImage = (file, maxWidth = 1280, quality = 0.8) => {
@@ -411,26 +453,16 @@
 
     const renderPreviews = () => {
       imagePreviewArea.innerHTML = '';
-      if (uploadedFiles.length === 0) { 
-        imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-8 text-center w-full">이미지를 선택해주세요.</p>'; 
-        return; 
-      }
-      
+      if (uploadedFiles.length === 0) { imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-8 text-center w-full">이미지를 선택해주세요.</p>'; return; }
       uploadedFiles.forEach((file, i) => {
         const div = document.createElement('div');
         div.className = 'preview-container';
         div.innerHTML = `
           <span class="preview-number">${i+1}</span>
           <img src="${URL.createObjectURL(file)}" class="preview-image">
-          <button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-preview-btn">✕</button>
+          <button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg">✕</button>
         `;
-
-        div.querySelector('.delete-preview-btn').onclick = (e) => {
-          e.stopPropagation();
-          uploadedFiles.splice(i, 1);
-          renderPreviews();
-        };
-
+        div.querySelector('button').onclick = (e) => { e.stopPropagation(); uploadedFiles.splice(i, 1); renderPreviews(); };
         imagePreviewArea.appendChild(div);
       });
     };
@@ -497,11 +529,9 @@
       }; showPasswordModal("초기화");
     };
 
-    onAuthStateChanged(auth, (user) => { 
-      updateAuthUI(user); 
-      if (user) setupSync(); 
-      else { el('userInfo').textContent = "로그인 필요"; el('signInBtn').classList.remove('hidden'); el('signOutBtn').classList.add('hidden'); }
-    });
+    // 초기 로드 시 실행
+    setupSync();
+    onAuthStateChanged(auth, updateAuthUI);
 
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
