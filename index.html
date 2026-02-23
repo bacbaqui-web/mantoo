@@ -81,16 +81,16 @@
       max-width: 90vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
+    /* 드래그 앤 드롭 영역 최적화 */
     #imagePreviewArea { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
       gap: 12px; 
       margin-top: 1rem; 
       padding: 12px; 
       background: #1a1a1a; 
       border-radius: 8px; 
       min-height: 120px;
-      position: relative;
     }
     
     .preview-container { 
@@ -98,37 +98,29 @@
       width: 100%; 
       aspect-ratio: 1 / 1; 
       cursor: grab; 
-      transition: transform 0.25s ease, opacity 0.2s ease;
+      transition: all 0.2s ease;
       user-select: none;
+      border: 2px solid transparent;
+      border-radius: 10px;
     }
     
     .preview-container.dragging { 
-      opacity: 0.1;
-      transform: scale(0.7);
-    }
-    
-    .drop-placeholder {
-      border: 2px dashed #475569;
-      background: rgba(71, 85, 105, 0.2);
-      border-radius: 8px;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      pointer-events: none;
-      transition: all 0.2s ease;
+      opacity: 0.4;
+      transform: scale(0.9);
+      border: 2px dashed #64748b;
     }
 
     .preview-image { 
       width: 100%; 
       height: 100%; 
       object-fit: cover; 
-      border-radius: 8px; 
-      border: 1px solid #333; 
+      border-radius: 8px;
     }
     
     .preview-number {
-      position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.75);
-      color: white; border-radius: 50%; width: 20px; height: 20px;
-      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 10;
+      position: absolute; top: 4px; left: 4px; background: rgba(0, 0, 0, 0.7);
+      color: white; border-radius: 50%; width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; z-index: 5;
     }
 
     .file-input-label { background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 700; display: block; }
@@ -145,7 +137,7 @@
 
   <!-- 상단 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
-    <span id="userInfo" class="text-sm opacity-80">데이터 확인 중...</span>
+    <span id="userInfo" class="text-sm opacity-80">연결 확인 중...</span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded hidden">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
@@ -240,8 +232,8 @@
       <input type="password" id="generalPasswordInput" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white text-center mb-2" placeholder="비밀번호">
       <p id="passwordErrorMessage" class="text-red-400 text-sm h-5 mb-4"></p>
       <div class="flex justify-center gap-2">
-        <button id="closePasswordModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg">취소</button>
-        <button id="confirmPasswordBtn" class="bg-slate-700 px-4 py-2 rounded-lg">확인</button>
+        <button id="closePasswordModalBtn" class="bg-gray-600 px-4 py-2 rounded-lg font-bold">취소</button>
+        <button id="confirmPasswordBtn" class="bg-slate-700 px-4 py-2 rounded-lg font-bold">확인</button>
       </div>
     </div>
   </div>
@@ -426,71 +418,76 @@
       });
     };
 
+    // --- 개편된 드래그 앤 드롭 로직 (안정성 최우선) ---
     const imagePreviewArea = el('imagePreviewArea');
-    el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files); renderPreviews(); };
+    el('comicFilesInput').onchange = (e) => { 
+      uploadedFiles = Array.from(e.target.files); 
+      renderPreviews(); 
+    };
 
     const renderPreviews = () => {
       imagePreviewArea.innerHTML = '';
-      if (uploadedFiles.length === 0) { imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-4 text-center">이미지를 선택해주세요.</p>'; return; }
+      if (uploadedFiles.length === 0) { 
+        imagePreviewArea.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-8 text-center w-full">이미지를 선택해주세요.</p>'; 
+        return; 
+      }
+      
       uploadedFiles.forEach((file, i) => {
         const div = document.createElement('div');
         div.className = 'preview-container';
         div.draggable = true;
         div.dataset.index = i;
-        div.innerHTML = `<span class="preview-number">${i+1}</span><img src="${URL.createObjectURL(file)}" class="preview-image"><button class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg delete-preview-btn">×</button>`;
-        div.ondragstart = (ev) => { dragStartIndex = i; div.classList.add('dragging'); ev.dataTransfer.effectAllowed = 'move'; };
-        div.ondragend = () => { div.classList.remove('dragging'); const p = el('drag-placeholder'); if (p) p.remove(); };
-        div.querySelector('.delete-preview-btn').onclick = (e) => { e.stopPropagation(); uploadedFiles.splice(i, 1); renderPreviews(); };
+        
+        div.innerHTML = `
+          <span class="preview-number">${i+1}</span>
+          <img src="${URL.createObjectURL(file)}" class="preview-image">
+          <button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-preview-btn">✕</button>
+        `;
+
+        // 1. 드래그 시작
+        div.ondragstart = (ev) => {
+          dragStartIndex = i;
+          div.classList.add('dragging');
+          ev.dataTransfer.effectAllowed = 'move';
+        };
+
+        // 2. 드래그 중인 이미지가 다른 이미지 위로 올라왔을 때 (정교한 인덱스 교체)
+        div.ondragenter = (ev) => {
+          ev.preventDefault();
+          if (dragStartIndex === null || dragStartIndex === i) return;
+
+          // 데이터 배열 내 순서 변경
+          const movedItem = uploadedFiles.splice(dragStartIndex, 1)[0];
+          uploadedFiles.splice(i, 0, movedItem);
+          
+          // 드래그 시작 인덱스를 현재 위치로 업데이트하여 연속 이동 가능케 함
+          dragStartIndex = i;
+          
+          // 데이터가 바뀌었으므로 리렌더링
+          renderPreviews();
+          
+          // 리렌더링된 새로운 요소에 'dragging' 클래스를 다시 주어 시각적 유지
+          const newDraggingEl = imagePreviewArea.querySelector(`[data-index="${i}"]`);
+          if (newDraggingEl) newDraggingEl.classList.add('dragging');
+        };
+
+        div.ondragover = (ev) => ev.preventDefault();
+
+        // 3. 드래그 종료 시 정리
+        div.ondragend = () => {
+          dragStartIndex = null;
+          div.classList.remove('dragging');
+        };
+
+        div.querySelector('.delete-preview-btn').onclick = (e) => {
+          e.stopPropagation();
+          uploadedFiles.splice(i, 1);
+          renderPreviews();
+        };
+
         imagePreviewArea.appendChild(div);
       });
     };
-
-    // 부드러운 드래그 핸들러 (위치 임계값 추가)
-    let lastInjectedIndex = -1;
-    imagePreviewArea.ondragover = (ev) => {
-      ev.preventDefault();
-      const afterElement = getDragAfterElement(imagePreviewArea, ev.clientX, ev.clientY);
-      const currentChildren = Array.from(imagePreviewArea.children).filter(c => c.id !== 'drag-placeholder');
-      const dropIndex = afterElement == null ? currentChildren.length : currentChildren.indexOf(afterElement);
-
-      if (dropIndex !== lastInjectedIndex) {
-        lastInjectedIndex = dropIndex;
-        const oldPlaceholder = el('drag-placeholder');
-        if (oldPlaceholder) oldPlaceholder.remove();
-        const placeholder = document.createElement('div');
-        placeholder.id = 'drag-placeholder';
-        placeholder.className = 'drop-placeholder';
-        if (afterElement == null) imagePreviewArea.appendChild(placeholder);
-        else imagePreviewArea.insertBefore(placeholder, afterElement);
-      }
-    };
-
-    imagePreviewArea.ondrop = (ev) => {
-      ev.preventDefault();
-      const placeholder = el('drag-placeholder');
-      if (!placeholder) return;
-      const currentChildren = Array.from(imagePreviewArea.children);
-      let dropIndex = currentChildren.indexOf(placeholder);
-      placeholder.remove();
-      lastInjectedIndex = -1;
-      const movedItem = uploadedFiles.splice(dragStartIndex, 1)[0];
-      if (dropIndex > dragStartIndex) dropIndex--;
-      uploadedFiles.splice(dropIndex, 0, movedItem);
-      renderPreviews();
-    };
-
-    function getDragAfterElement(container, x, y) {
-      const draggableElements = [...container.querySelectorAll('.preview-container:not(.dragging)')];
-      return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const centerX = box.left + box.width / 2;
-        const centerY = box.top + box.height / 2;
-        const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-        if (distance < closest.offset) {
-          return { offset: distance, element: x < centerX ? child : child.nextElementSibling };
-        } else return closest;
-      }, { offset: Number.POSITIVE_INFINITY }).element;
-    }
 
     el('submitComicBtn').onclick = async () => {
       const name = el('uploadNickname').value.trim(); if (!name || uploadedFiles.length === 0) return showAlert("이름과 이미지를 입력하세요.");
