@@ -29,7 +29,6 @@
       max-width: 1200px;
     }
     
-    /* ✅ 수정: 세로 쌓임(Masonry) 대신 가로 쌓임(Grid)으로 변경 */
     #comic-grid { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
@@ -48,7 +47,6 @@
       background: #222; 
       border-radius: 16px; 
       overflow: visible; 
-      /* margin-bottom 제거 (Grid gap이 담당) */
       width: 100%; 
       display: block; 
       cursor: pointer; 
@@ -191,7 +189,8 @@
     <div class="modal-content relative bg-black border-none">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
       <h3 id="modalComicNickname" class="text-3xl font-black mb-10 text-white text-center tracking-tighter"></h3>
-      <div id="modalImageContainer" class="flex flex-col gap-10 max-w-2xl mx-auto pb-20"></div>
+      <!-- ✅ 수정: 이미지 간의 빈틈을 없애기 위해 gap-0으로 변경 -->
+      <div id="modalImageContainer" class="flex flex-col gap-0 max-w-2xl mx-auto pb-20"></div>
     </div>
   </div>
 
@@ -326,7 +325,14 @@
     const openViewer = (c) => {
       el('modalComicNickname').textContent = `${c.uploaderName} 작가님`;
       const con = el('modalImageContainer'); con.innerHTML = '';
-      c.images.forEach(img => { const i = document.createElement('img'); i.src = img.imageUrl; i.className = "w-full rounded-2xl shadow-2xl border border-gray-800"; con.appendChild(i); });
+      c.images.forEach(img => { 
+        const i = document.createElement('img'); 
+        i.src = img.imageUrl; 
+        // ✅ 수정: 테두리 둥근 효과(rounded-2xl), 그림자(shadow-2xl), 테두리선(border) 모두 제거
+        // 'block'을 추가하여 이미지 하단에 미세하게 남는 여백 방지
+        i.className = "w-full block"; 
+        con.appendChild(i); 
+      });
       el('imageModal').style.display = 'flex';
     };
 
@@ -500,7 +506,7 @@
     };
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
+    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
         if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
