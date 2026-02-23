@@ -81,7 +81,6 @@
       max-width: 90vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    /* 이미지 미리보기 컨테이너 애니메이션 강화 */
     #imagePreviewArea { 
       display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; 
       margin-top: 1rem; padding: 12px; background: #1a1a1a; border-radius: 8px; min-height: 100px; 
@@ -91,15 +90,8 @@
       transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.3s ease; 
       user-select: none;
     }
-    .preview-container.dragging { 
-      opacity: 0.4; 
-      transform: scale(0.9); 
-      z-index: 100;
-    }
-    .preview-container.drag-over {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    }
+    .preview-container.dragging { opacity: 0.4; transform: scale(0.9); z-index: 100; }
+    .preview-container.drag-over { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
     .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #444; }
     .preview-number {
       position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.75);
@@ -120,14 +112,12 @@
 </head>
 <body class="text-white">
 
-  <!-- 상단 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-2 mb-2">
     <span id="userInfo" class="text-sm opacity-80"></span>
     <button id="signInBtn" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded">Google 로그인</button>
     <button id="signOutBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded hidden">로그아웃</button>
   </div>
 
-  <!-- 메인 타이틀 영역 -->
   <div class="w-full max-w-2xl flex items-center justify-center relative mb-6 px-12">
     <h1 id="mainTitleDisplay" class="text-4xl font-bold text-center text-white">만투</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-500 hover:text-white transition-colors hidden" title="관리자 설정">
@@ -138,7 +128,6 @@
     </button>
   </div>
   
-  <!-- 메인 배너 이미지 -->
   <div class="w-full max-w-2xl px-4">
     <img id="mainBanner" class="hidden w-full rounded-xl shadow-lg mb-6 object-cover border border-gray-800" alt="만투 메인 배너">
   </div>
@@ -147,7 +136,6 @@
     이번 주제: <span id="currentTopicText"></span>
   </h2>
 
-  <!-- 메인 콘텐츠 섹션 -->
   <div id="comics-section" class="section-card text-left">
     <section class="text-center mb-6 flex flex-wrap justify-center gap-4">
       <button id="startContestBtn" class="admin-button">대전 시작</button>
@@ -158,7 +146,6 @@
       <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
     </section>
     
-    <!-- 만화 그리드 -->
     <div id="comic-grid"></div>
   </div>
 
@@ -184,7 +171,6 @@
     </div>
   </div>
 
-  <!-- 만화 보기 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative">
       <button id="closeImageModalBtn" class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 z-50">
@@ -206,7 +192,7 @@
       <div class="mb-4">
         <label for="comicFilesInput" class="file-input-label">이미지 선택</label>
         <input type="file" id="comicFilesInput" multiple accept="image/*">
-        <p class="text-xs text-gray-500 mt-2 text-center">이미지를 드래그하여 순서를 변경하세요.</p>
+        <p class="text-xs text-gray-500 mt-2 text-center">이미지는 자동으로 최적화되어 업로드됩니다.</p>
       </div>
       <div id="imagePreviewArea"></div>
       <div class="flex justify-end gap-3 mt-8">
@@ -229,7 +215,6 @@
     </div>
   </div>
 
-  <!-- 제시어 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
@@ -242,7 +227,7 @@
   </div>
 
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-white text-lg mb-6"></p><div class="flex justify-center gap-3"><button id="modal-cancel-btn" class="px-5 py-2 bg-gray-600 rounded-md hidden">취소</button><button id="modal-confirm-btn" class="px-5 py-2 bg-slate-700 rounded-md">확인</button></div></div></div>
-  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-80 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div><p class="text-white text-lg">데이터 처리 중...</p></div></div>
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-80 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div><p id="loading-text" class="text-white text-lg">데이터 처리 중...</p></div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -271,7 +256,10 @@
     let currentStatus = "", currentTopic = "", comics = [], uploadedFiles = [], dragStartIndex = null, pendingAction = null;
 
     const el = (id) => document.getElementById(id);
-    const showLoading = (show) => el('loading-overlay').classList.toggle('hidden', !show);
+    const showLoading = (show, text = "데이터 처리 중...") => {
+      el('loading-text').textContent = text;
+      el('loading-overlay').classList.toggle('hidden', !show);
+    };
 
     const showAlert = (msg, isConfirm = false) => {
       el('modal-message').textContent = msg;
@@ -333,17 +321,10 @@
         currentStatus = data.status || ""; currentTopic = data.topic || "";
         el('mainTitleDisplay').textContent = data.appTitle || "만투";
         document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
-        
-        if (data.bannerUrl && currentStatus === "") { 
-          el('mainBanner').src = data.bannerUrl; 
-          el('mainBanner').classList.remove('hidden'); 
-        } else { 
-          el('mainBanner').classList.add('hidden'); 
-        }
-
+        if (data.bannerUrl && currentStatus === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
+        else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = currentTopic;
         el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
-        
         const isMgr = auth.currentUser && !auth.currentUser.isAnonymous;
         el('startContestBtn').classList.toggle('hidden', !isMgr || currentStatus !== "");
         el('showUploadModalBtn').classList.toggle('hidden', !isMgr || currentStatus !== "uploading");
@@ -382,110 +363,104 @@
     };
 
     el('confirmPasswordBtn').onclick = () => {
-      if (el('generalPasswordInput').value === ADMIN_PW) { 
-        el('generalPasswordModal').style.display = 'none'; 
-        if (pendingAction) { pendingAction(); pendingAction = null; } 
-      } else el('passwordErrorMessage').textContent = "틀렸습니다.";
+      if (el('generalPasswordInput').value === ADMIN_PW) { el('generalPasswordModal').style.display = 'none'; if (pendingAction) { pendingAction(); pendingAction = null; } }
+      else el('passwordErrorMessage').textContent = "틀렸습니다.";
     };
 
-    // 이미지 업로드 로직 (4장 제한 삭제 및 애니메이션 강화)
-    el('comicFilesInput').onchange = (e) => { 
-      uploadedFiles = Array.from(e.target.files); 
-      renderPreviews(); 
+    // 이미지 리사이징 함수
+    const resizeImage = (file, maxWidth = 1280, quality = 0.8) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                // 원본 파일보다 작을 때만 리사이징된 블롭 반환, 아니면 원본 반환
+                resolve(blob.size < file.size ? blob : file);
+              } else {
+                reject(new Error('Canvas to Blob failed'));
+              }
+            }, 'image/jpeg', quality);
+          };
+          img.onerror = reject;
+        };
+        reader.onerror = reject;
+      });
     };
+
+    el('comicFilesInput').onchange = (e) => { uploadedFiles = Array.from(e.target.files); renderPreviews(); };
 
     const renderPreviews = () => {
       const area = el('imagePreviewArea'); area.innerHTML = '';
-      if (uploadedFiles.length === 0) {
-        area.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-4">이미지를 선택해주세요.</p>';
-        return;
-      }
-
+      if (uploadedFiles.length === 0) { area.innerHTML = '<p class="text-gray-500 text-sm col-span-full py-4">이미지를 선택해주세요.</p>'; return; }
       uploadedFiles.forEach((file, i) => {
-        const div = document.createElement('div'); 
-        div.className = 'preview-container'; 
-        div.draggable = true;
-        div.dataset.index = i;
-        
-        div.innerHTML = `
-          <span class="preview-number">${i+1}</span>
-          <img src="${URL.createObjectURL(file)}" class="preview-image">
-          <button class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg delete-preview-btn">×</button>
-        `;
-
-        // 드래그 이벤트
-        div.ondragstart = (ev) => { 
-          dragStartIndex = i; 
-          div.classList.add('dragging');
-          ev.dataTransfer.effectAllowed = 'move';
-        };
-        
+        const div = document.createElement('div'); div.className = 'preview-container'; div.draggable = true; div.dataset.index = i;
+        div.innerHTML = `<span class="preview-number">${i+1}</span><img src="${URL.createObjectURL(file)}" class="preview-image"><button class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg delete-preview-btn">×</button>`;
+        div.ondragstart = (ev) => { dragStartIndex = i; div.classList.add('dragging'); ev.dataTransfer.effectAllowed = 'move'; };
         div.ondragenter = () => div.classList.add('drag-over');
         div.ondragleave = () => div.classList.remove('drag-over');
-        
         div.ondragover = (ev) => ev.preventDefault();
-        
-        div.ondrop = () => {
-          div.classList.remove('drag-over');
-          const item = uploadedFiles.splice(dragStartIndex, 1)[0];
-          uploadedFiles.splice(i, 0, item);
-          renderPreviews();
-        };
-        
+        div.ondrop = () => { div.classList.remove('drag-over'); const item = uploadedFiles.splice(dragStartIndex, 1)[0]; uploadedFiles.splice(i, 0, item); renderPreviews(); };
         div.ondragend = () => div.classList.remove('dragging');
-
-        // 이미지 삭제 버튼
-        div.querySelector('.delete-preview-btn').onclick = (e) => {
-          e.stopPropagation();
-          uploadedFiles.splice(i, 1);
-          renderPreviews();
-        };
-
+        div.querySelector('.delete-preview-btn').onclick = (e) => { e.stopPropagation(); uploadedFiles.splice(i, 1); renderPreviews(); };
         area.appendChild(div);
       });
     };
 
     el('submitComicBtn').onclick = async () => {
-      const name = el('uploadNickname').value.trim(); 
-      if (!name || uploadedFiles.length === 0) return showAlert("이름과 이미지를 모두 입력해주세요.");
-      showLoading(true);
+      const name = el('uploadNickname').value.trim(); if (!name || uploadedFiles.length === 0) return showAlert("이름과 이미지를 입력하세요.");
+      showLoading(true, "이미지 최적화 및 업로드 중...");
       try {
         const comicRef = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
         for (let i = 0; i < uploadedFiles.length; i++) {
-          const path = `mantu/${APP_ID}/${comicRef.id}/${i}_${Date.now()}`;
+          // 업로드 전 이미지 리사이징
+          const optimizedFile = await resizeImage(uploadedFiles[i]);
+          const path = `mantu/${APP_ID}/${comicRef.id}/${i}_${Date.now()}.jpg`;
           const sRef = storageRef(storage, path);
-          await uploadBytesResumable(sRef, uploadedFiles[i]);
+          await uploadBytesResumable(sRef, optimizedFile);
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
         await setDoc(comicRef, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: currentTopic });
-        el('uploadModal').style.display = 'none'; 
-        uploadedFiles = [];
-        showAlert("작품이 등록되었습니다!");
+        el('uploadModal').style.display = 'none'; uploadedFiles = []; showAlert("등록되었습니다!");
       } catch (e) { showAlert("실패: " + e.message); }
       showLoading(false);
     };
 
     el('openSettingsBtn').onclick = () => { pendingAction = () => { el('newTitleInput').value = el('mainTitleDisplay').textContent; el('settingsModal').style.display = 'flex'; }; showPasswordModal("관리자 설정"); };
     el('closeSettingsModalBtn').onclick = () => el('settingsModal').style.display = 'none';
-
     el('saveTitleBtn').onclick = async () => {
       const title = el('newTitleInput').value.trim(); if (!title) return;
       showLoading(true);
-      try {
-        await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: title }, { merge: true });
-        showAlert("변경 완료");
-      } catch (e) { showAlert("실패: " + e.message); }
+      try { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: title }, { merge: true }); showAlert("변경 완료"); } 
+      catch (e) { showAlert("실패: " + e.message); }
       showLoading(false);
     };
-
     el('triggerBannerBtn').onclick = () => el('bannerFileInput').click();
     el('bannerFileInput').onchange = async (e) => {
       const file = e.target.files[0]; if (!file) return;
-      showLoading(true);
+      showLoading(true, "배너 최적화 중...");
       try {
-        const path = `mantu/banners/${APP_ID}/banner_${Date.now()}`;
+        const optimizedBanner = await resizeImage(file, 1920, 0.9); // 배너는 고화질 유지
+        const path = `mantu/banners/${APP_ID}/banner_${Date.now()}.jpg`;
         const sRef = storageRef(storage, path);
-        await uploadBytesResumable(sRef, file);
+        await uploadBytesResumable(sRef, optimizedBanner);
         const url = await getDownloadURL(sRef);
         await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true });
         showAlert("배너 변경 완료");
@@ -496,12 +471,9 @@
     el('startContestBtn').onclick = () => { pendingAction = () => el('topicModal').style.display = 'flex'; showPasswordModal("시작"); };
     el('submitTopicBtn').onclick = async () => {
       const topic = el('topicInput').value.trim(); if (!topic) return;
-      showLoading(true);
-      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic, updatedAt: serverTimestamp() }, { merge: true });
-      el('topicModal').style.display = 'none';
-      showLoading(false);
+      showLoading(true); await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic, updatedAt: serverTimestamp() }, { merge: true });
+      el('topicModal').style.display = 'none'; showLoading(false);
     };
-
     el('endContestBtn').onclick = () => { pendingAction = async () => await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("마감"); };
     el('startVotingBtn').onclick = () => { pendingAction = async () => await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
     el('endVotingBtn').onclick = () => { pendingAction = async () => await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); showPasswordModal("결과 발표"); };
@@ -510,8 +482,7 @@
         if (await showAlert("초기화하시겠습니까?", true)) {
           showLoading(true);
           for (const c of comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
-          await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true });
-          showLoading(false);
+          await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true }); showLoading(false);
         }
       }; showPasswordModal("초기화");
     };
@@ -519,11 +490,7 @@
     onAuthStateChanged(auth, (user) => { updateAuthUI(user); if (user) setupSync(); });
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
-    el('showUploadModalBtn').onclick = () => {
-      uploadedFiles = [];
-      el('imagePreviewArea').innerHTML = '';
-      el('uploadModal').style.display = 'flex';
-    };
+    el('showUploadModalBtn').onclick = () => { uploadedFiles = []; el('imagePreviewArea').innerHTML = ''; el('uploadModal').style.display = 'flex'; };
     el('cancelUploadBtn').onclick = () => el('uploadModal').style.display = 'none';
     el('closeImageModalBtn').onclick = () => el('imageModal').style.display = 'none';
     el('closePasswordModalBtn').onclick = () => el('generalPasswordModal').style.display = 'none';
