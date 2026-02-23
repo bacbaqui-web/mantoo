@@ -124,7 +124,7 @@
     </button>
   </div>
   
-  <!-- 메인 배너 이미지 -->
+  <!-- 메인 배너 이미지 (대전 시작 시 숨겨짐) -->
   <div class="w-full max-w-2xl px-4">
     <img id="mainBanner" class="hidden w-full rounded-xl shadow-lg mb-6 object-cover border border-gray-800" alt="만투 메인 배너">
   </div>
@@ -239,7 +239,7 @@
       apiKey: "AIzaSyBqtqjmEIPydo7ibbGePf_oEb0GXVcZI6E",
       authDomain: "ne-cut-battle.firebaseapp.com",
       projectId: "ne-cut-battle",
-      storageBucket: "ne-cut-battle.firebasestorage.app", // 스크린샷 주소 적용
+      storageBucket: "ne-cut-battle.firebasestorage.app",
       messagingSenderId: "565872837701",
       appId: "1:565872837701:web:3c57c4bab8d37644018f2c"
     };
@@ -317,8 +317,17 @@
         const data = d.data(); if (!data) return;
         currentStatus = data.status || ""; currentTopic = data.topic || "";
         el('mainTitleDisplay').textContent = data.appTitle || "만투";
-        if (data.bannerUrl) { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
-        else { el('mainBanner').classList.add('hidden'); }
+        document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
+        
+        // --- 배너 표시 로직 수정: 대전 중(status가 비어있지 않음)일 때는 숨김 ---
+        if (data.bannerUrl && currentStatus === "") { 
+          el('mainBanner').src = data.bannerUrl; 
+          el('mainBanner').classList.remove('hidden'); 
+        } else { 
+          el('mainBanner').classList.add('hidden'); 
+        }
+        // -----------------------------------------------------------
+
         el('currentTopicText').textContent = currentTopic;
         el('currentTopicDisplay').classList.toggle('hidden', !currentTopic);
         
@@ -402,7 +411,6 @@
       const title = el('newTitleInput').value.trim(); if (!title) return;
       showLoading(true);
       try {
-        // updateDoc 대신 setDoc with merge: true를 사용하여 문서가 없을 때 생기는 오류 방지
         await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: title }, { merge: true });
         showAlert("변경 완료");
       } catch (e) { showAlert("실패: " + e.message); }
