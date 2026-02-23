@@ -81,7 +81,6 @@
       max-width: 90vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    /* 드래그 앤 드롭 영역 최적화 */
     #imagePreviewArea { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
@@ -97,17 +96,8 @@
       position: relative; 
       width: 100%; 
       aspect-ratio: 1 / 1; 
-      cursor: grab; 
-      transition: all 0.2s ease;
-      user-select: none;
-      border: 2px solid transparent;
       border-radius: 10px;
-    }
-    
-    .preview-container.dragging { 
-      opacity: 0.4;
-      transform: scale(0.9);
-      border: 2px dashed #64748b;
+      overflow: hidden;
     }
 
     .preview-image { 
@@ -226,6 +216,7 @@
     </div>
   </div>
 
+  <!-- 비밀번호 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-xl font-bold mb-4">관리자 인증</h2>
@@ -238,6 +229,7 @@
     </div>
   </div>
 
+  <!-- 제시어 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 class="text-xl font-bold mb-4">제시어 설정</h2>
@@ -418,7 +410,7 @@
       });
     };
 
-    // --- 개편된 드래그 앤 드롭 로직 (안정성 최우선) ---
+    // --- 단순화된 미리보기 로직 (순서 변경 삭제) ---
     const imagePreviewArea = el('imagePreviewArea');
     el('comicFilesInput').onchange = (e) => { 
       uploadedFiles = Array.from(e.target.files); 
@@ -435,49 +427,11 @@
       uploadedFiles.forEach((file, i) => {
         const div = document.createElement('div');
         div.className = 'preview-container';
-        div.draggable = true;
-        div.dataset.index = i;
-        
         div.innerHTML = `
           <span class="preview-number">${i+1}</span>
           <img src="${URL.createObjectURL(file)}" class="preview-image">
           <button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg delete-preview-btn">✕</button>
         `;
-
-        // 1. 드래그 시작
-        div.ondragstart = (ev) => {
-          dragStartIndex = i;
-          div.classList.add('dragging');
-          ev.dataTransfer.effectAllowed = 'move';
-        };
-
-        // 2. 드래그 중인 이미지가 다른 이미지 위로 올라왔을 때 (정교한 인덱스 교체)
-        div.ondragenter = (ev) => {
-          ev.preventDefault();
-          if (dragStartIndex === null || dragStartIndex === i) return;
-
-          // 데이터 배열 내 순서 변경
-          const movedItem = uploadedFiles.splice(dragStartIndex, 1)[0];
-          uploadedFiles.splice(i, 0, movedItem);
-          
-          // 드래그 시작 인덱스를 현재 위치로 업데이트하여 연속 이동 가능케 함
-          dragStartIndex = i;
-          
-          // 데이터가 바뀌었으므로 리렌더링
-          renderPreviews();
-          
-          // 리렌더링된 새로운 요소에 'dragging' 클래스를 다시 주어 시각적 유지
-          const newDraggingEl = imagePreviewArea.querySelector(`[data-index="${i}"]`);
-          if (newDraggingEl) newDraggingEl.classList.add('dragging');
-        };
-
-        div.ondragover = (ev) => ev.preventDefault();
-
-        // 3. 드래그 종료 시 정리
-        div.ondragend = () => {
-          dragStartIndex = null;
-          div.classList.remove('dragging');
-        };
 
         div.querySelector('.delete-preview-btn').onclick = (e) => {
           e.stopPropagation();
