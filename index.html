@@ -189,7 +189,6 @@
     <div class="modal-content relative bg-black border-none">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
       <h3 id="modalComicNickname" class="text-3xl font-black mb-10 text-white text-center tracking-tighter"></h3>
-      <!-- ✅ 수정: 이미지 간의 빈틈을 없애기 위해 gap-0으로 변경 -->
       <div id="modalImageContainer" class="flex flex-col gap-0 max-w-2xl mx-auto pb-20"></div>
     </div>
   </div>
@@ -328,8 +327,6 @@
       c.images.forEach(img => { 
         const i = document.createElement('img'); 
         i.src = img.imageUrl; 
-        // ✅ 수정: 테두리 둥근 효과(rounded-2xl), 그림자(shadow-2xl), 테두리선(border) 모두 제거
-        // 'block'을 추가하여 이미지 하단에 미세하게 남는 여백 방지
         i.className = "w-full block"; 
         con.appendChild(i); 
       });
@@ -373,7 +370,8 @@
     const toggleLike = async (id) => {
       if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
-      if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만 할 수 있습니다!");
+      // ✅ 수정: 메시지 중앙 정렬 및 줄바꿈 적용
+      if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만<br>할 수 있습니다!");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
     };
 
