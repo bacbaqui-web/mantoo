@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>만투 - 네컷만화 투표</title>
+  
+  <!-- ✅ 공유 시 표시되는 정보 (Open Graph) -->
+  <title>만투 프로젝트 - 만화로 맞짱뜨자!</title>
+  <meta property="og:title" content="만투 프로젝트">
+  <meta property="og:description" content="만화로 맞짱뜨자!">
+  <meta name="description" content="만화로 맞짱뜨자!">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
   <style>
@@ -338,7 +344,10 @@
         const data = d.data(); if (!data) return;
         state.status = data.status || ""; state.topic = data.topic || "";
         el('mainTitleDisplay').textContent = data.appTitle || "만투";
-        document.title = `${data.appTitle || "만투"} - 네컷만화 투표`;
+        
+        // ✅ 수정: 실시간 업데이트 시에도 '만투 프로젝트'가 기본값이 되도록 변경
+        document.title = `${data.appTitle || "만투 프로젝트"} - 만화로 맞짱뜨자!`;
+        
         if (data.bannerUrl && state.status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = state.topic;
@@ -363,14 +372,13 @@
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
       el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      el('signInBtn').classList.toggle('hidden', !!user && !user.isAnonymous);
+      el('signInBtn').classList.toggle('hidden', !!user);
       el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
-      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
+      if (!auth.currentUser) return showAlert("투표하려면 로그인이 필요합니다.");
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
-      // ✅ 수정: 메시지 중앙 정렬 및 줄바꿈 적용
       if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만<br>할 수 있습니다!");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
     };
@@ -456,10 +464,6 @@
     };
 
     el('submitComicBtn').onclick = async () => {
-      if (!auth.currentUser || auth.currentUser.isAnonymous) {
-        await showAlert("업로드하려면 구글 로그인이 필요합니다.");
-        return;
-      }
       const name = el('uploadNickname').value.trim(); 
       if (!name || state.files.length === 0) return showAlert("닉네임과 작품 사진을 확인해 주세요.");
       showLoading(true, "Processing...");
@@ -504,7 +508,7 @@
     };
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
+    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
         if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
