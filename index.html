@@ -28,10 +28,19 @@
       width: 100%;
       max-width: 1200px;
     }
-    #comic-grid { column-count: 2; column-gap: 1.5rem; margin-top: 2rem; display: block; }
-    @media (min-width: 640px) { #comic-grid { column-count: 3; } }
-    @media (min-width: 1024px) { #comic-grid { column-count: 4; } }
-    @media (min-width: 1280px) { #comic-grid { column-count: 5; } }
+    
+    /* ✅ 수정: 세로 쌓임(Masonry) 대신 가로 쌓임(Grid)으로 변경 */
+    #comic-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 1.5rem; 
+      margin-top: 2rem; 
+      width: 100%;
+      align-items: start;
+    }
+    @media (min-width: 640px) { #comic-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { #comic-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 1280px) { #comic-grid { grid-template-columns: repeat(5, 1fr); } }
     
     .comic-card { 
       position: relative; 
@@ -39,8 +48,7 @@
       background: #222; 
       border-radius: 16px; 
       overflow: visible; 
-      margin-bottom: 3.5rem; 
-      break-inside: avoid; 
+      /* margin-bottom 제거 (Grid gap이 담당) */
       width: 100%; 
       display: block; 
       cursor: pointer; 
@@ -292,7 +300,6 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${hasLiked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
               </svg>
-              <!-- ✅ FIX: '따봉'을 '좋아요'로 변경 -->
               <span>${hasLiked ? '완료' : '좋아요'}</span>
             </button>
             <span class="like-count">${likes}</span>
@@ -493,7 +500,7 @@
     };
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
+    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
         if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
