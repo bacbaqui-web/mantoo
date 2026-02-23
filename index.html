@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>만투 - 네컷만화 투표</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #0a0a0a;
+      color: #efefef;
       display: flex;
       justify-content: flex-start;
       align-items: center;
       min-height: 100vh;
-      padding: 16px;
+      padding: 20px;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.5rem;
+      letter-spacing: -0.025em;
     }
     .section-card {
-      background: #2a2a2a;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,.3);
-      text-align: center;
+      background: #161616;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       width: 100%;
       max-width: 1200px;
     }
@@ -35,85 +35,107 @@
     
     .comic-card { 
       position: relative; 
-      transition: all .2s ease-in-out; 
-      background: #333; 
-      border-radius: 12px; 
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: #222; 
+      border-radius: 16px; 
       overflow: visible; 
       margin-bottom: 3.5rem; 
       break-inside: avoid; 
       width: 100%; 
       display: block; 
       cursor: pointer; 
-      border: 3px solid transparent; 
+      border: 2px solid transparent; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .comic-card.disabled { cursor: not-allowed; opacity: 0.7; }
+    .comic-card.disabled { cursor: not-allowed; opacity: 0.8; }
     
-    /* 순위 메달 스타일 강화 */
-    .comic-card.rank-1 { border-color: #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); z-index: 10; scale: 1.05; }
-    .comic-card.rank-2 { border-color: #C0C0C0; box-shadow: 0 0 20px rgba(192, 192, 192, 0.3); }
-    .comic-card.rank-3 { border-color: #CD7F32; box-shadow: 0 0 20px rgba(205, 127, 50, 0.3); }
+    .comic-card.rank-1 { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); scale: 1.05; z-index: 10; }
+    .comic-card.rank-2 { border-color: #94a3b8; }
+    .comic-card.rank-3 { border-color: #92400e; }
     
     .rank-medal { 
-      position: absolute; top: -30px; left: -25px; font-size: 4.5rem; line-height: 1; 
-      text-shadow: 0 4px 15px rgba(0,0,0,1); z-index: 100; 
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-      animation: winner-bounce 2s infinite ease-in-out;
+      position: absolute; top: -35px; left: -25px; font-size: 4.5rem; line-height: 1; 
+      text-shadow: 0 4px 20px rgba(0,0,0,1); z-index: 100; 
+      animation: winner-bounce 2.5s infinite ease-in-out;
+      filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
     }
     @keyframes winner-bounce {
-      0%, 100% { transform: translateY(0) scale(1) rotate(-5deg); }
-      50% { transform: translateY(-10px) scale(1.1) rotate(5deg); }
+      0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
+      50% { transform: translateY(-12px) rotate(5deg) scale(1.1); }
     }
 
-    .comic-card:not(.disabled):hover { transform: translateY(-10px); background: #444; }
+    .comic-card:not(.disabled):hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); background: #2a2a2a; }
     
     .comic-card .content { 
       display: flex; flex-direction: column; justify-content: center; align-items: center; 
-      width: 100%; min-height: 130px; padding: 20px; text-align: center; background-color: #1a1a1a; 
-      position: relative; border-radius: 9px 9px 0 0;
+      width: 100%; min-height: 140px; padding: 24px; text-align: center; background-color: #1a1a1a; 
+      position: relative; border-radius: 14px 14px 0 0;
     }
-    .comic-card .nickname-display { font-size: 1.4rem; font-weight: 800; color: #fff; word-break: break-all; }
-    .comic-card .sub-text { font-size: 0.85rem; color: #aaa; margin-top: 6px; }
-    .comic-card .info-footer { padding: 12px; background: #333; text-align: left; border-radius: 0 0 9px 9px; }
+    .comic-card .nickname-display { font-size: 1.4rem; font-weight: 900; color: #fff; word-break: break-all; }
+    .comic-card .sub-text { font-size: 0.9rem; color: #888; margin-top: 8px; font-weight: 500; }
+    .comic-card .info-footer { padding: 14px 18px; background: #222; text-align: left; border-radius: 0 0 14px 14px; }
     
     .like-btn { 
-      display: flex; align-items: center; gap: 8px; background: #444; color: white; 
-      padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; 
+      display: flex; align-items: center; gap: 8px; background: #333; color: white; 
+      padding: 10px 18px; border-radius: 24px; font-size: 0.95rem; font-weight: 700; 
       transition: all 0.2s ease; cursor: pointer; border: none; 
     }
-    .like-btn.liked { background: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
-    .like-btn:not(.disabled):hover:not(.liked) { background: #555; }
-    .like-btn.disabled { background: #333; color: #777; cursor: not-allowed; }
-    .like-count { font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-left: 8px; }
+    .like-btn.liked { background: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+    .like-btn:not(.disabled):hover:not(.liked) { background: #444; }
+    .like-count { font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-left: auto; }
 
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.96); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     .modal-content { 
-      background-color: #1a1a1a; padding: 1.5rem; border-radius: 12px; 
-      max-width: 95vw; max-height: 90vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
+      background-color: #1a1a1a; padding: 2rem; border-radius: 24px; border: 1px solid #333;
+      max-width: 95vw; max-height: 92vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
     }
     
-    #imagePreviewArea { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 16px; margin-top: 1rem; padding: 16px; background: #1a1a1a; border-radius: 8px; }
-    .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; }
-    .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #444; }
+    /* 세련된 업로드 영역 디자인 */
+    .custom-file-upload {
+      border: 2px dashed #444;
+      border-radius: 20px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
+    .custom-file-upload svg { color: #666; width: 48px; height: 48px; transition: color 0.3s ease; }
+    .custom-file-upload:hover svg { color: #3b82f6; }
     
-    .admin-button { background: #475569; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
-    .admin-button:hover { background: #334155; }
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; }
+    #imagePreviewArea { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; margin-top: 1.5rem; }
+    .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; scale: 0.9; } to { opacity: 1; scale: 1; } }
+    .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #333; }
+    
+    .admin-button { 
+      background: #334155; color: white; padding: 12px 20px; border-radius: 12px; 
+      cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
+    }
+    .admin-button:hover { background: #1e293b; border-color: #64748b; }
+    
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
   </style>
 </head>
 <body class="text-white">
 
   <!-- 상단 인증 바 -->
-  <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-3 mb-2">
-    <span id="userInfo" class="text-sm font-bold text-gray-400">연결 대기 중...</span>
-    <button id="signInBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg font-bold hidden">로그인</button>
-    <button id="signOutBtn" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg font-bold hidden">로그아웃</button>
+  <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-3 mb-2 px-4">
+    <span id="userInfo" class="text-xs font-bold text-gray-500 uppercase tracking-widest">Connect Wait...</span>
+    <button id="signInBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">LOGIN</button>
+    <button id="signOutBtn" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">LOGOUT</button>
   </div>
 
   <!-- 메인 타이틀 영역 -->
-  <div class="w-full max-w-2xl flex items-center justify-center relative mb-6 px-12">
-    <h1 id="mainTitleDisplay" class="text-4xl font-black text-center text-white tracking-tighter">만투</h1>
-    <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-500 hover:text-white transition-colors hidden">
+  <div class="w-full max-w-2xl flex items-center justify-center relative mb-8 px-12">
+    <h1 id="mainTitleDisplay" class="text-5xl font-black text-center text-white tracking-tighter italic">만투</h1>
+    <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -121,96 +143,109 @@
     </button>
   </div>
   
-  <!-- 배너 영역 -->
   <div class="w-full max-w-2xl px-4">
-    <img id="mainBanner" class="hidden w-full rounded-xl shadow-2xl mb-8 object-cover border-2 border-gray-800" alt="배너">
+    <img id="mainBanner" class="hidden w-full rounded-3xl shadow-2xl mb-10 object-cover border-4 border-[#1a1a1a]" alt="배너">
   </div>
 
-  <!-- 대전 주제 표시 -->
-  <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-300 text-center mb-8 hidden">
-    이번 주제: <span id="currentTopicText" class="px-2 bg-yellow-900 bg-opacity-30 rounded"></span>
+  <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 text-center mb-10 hidden">
+    TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
   </h2>
 
-  <!-- 콘텐츠 구역 -->
-  <div id="comics-section" class="section-card text-left">
-    <section class="text-center mb-8 flex flex-wrap justify-center gap-4">
+  <div id="comics-section" class="w-full max-w-6xl">
+    <section class="text-center mb-12 flex flex-wrap justify-center gap-5">
       <!-- 💡 '대전 시작' 버튼: 관리자 전용 -->
-      <button id="startContestBtn" class="admin-button hidden">대전 시작</button>
+      <button id="startContestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">대전 시작하기</button>
       
-      <!-- 💡 대전 상태에 따라 동적으로 나타나는 버튼들 -->
-      <button id="showUploadModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl text-xl shadow-lg transform transition active:scale-95 hidden">+ 작품 올리기</button>
+      <!-- 💡 상태별 버튼들 -->
+      <button id="showUploadModalBtn" class="bg-white hover:bg-gray-200 text-black font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">+ 작품 업로드</button>
       <button id="endContestBtn" class="admin-button hidden">업로드 마감</button>
       <button id="startVotingBtn" class="admin-button hidden">투표 시작</button>
-      <button id="endVotingBtn" class="admin-button hidden">투표 종료 및 결과 발표</button>
-      <button id="resetContestBtn" class="admin-button hidden">전체 초기화</button>
+      <button id="endVotingBtn" class="admin-button hidden">결과 발표</button>
+      <button id="resetContestBtn" class="admin-button hidden text-red-400">데이터 초기화</button>
     </section>
 
-    <!-- 작품 그리드 (데이터 없을 시 완전 빈 공간) -->
+    <!-- 작품 그리드 -->
     <div id="comic-grid"></div>
   </div>
 
   <!-- 관리자 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
-      <h2 class="text-2xl font-black mb-8">관리자 센터</h2>
-      <div class="mb-6 text-left">
-        <label class="block text-sm font-bold text-gray-400 mb-1">앱 제목</label>
-        <div class="flex gap-2"><input type="text" id="newTitleInput" class="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white font-bold"><button id="saveTitleBtn" class="bg-blue-600 px-4 py-2 rounded-lg font-bold">변경</button></div>
-      </div>
+      <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
       <div class="mb-8 text-left">
-        <label class="block text-sm font-bold text-gray-400 mb-1">JPG 배너 업로드</label>
-        <button id="triggerBannerBtn" class="w-full bg-gray-700 py-4 rounded-lg font-bold border-2 border-dashed border-gray-600">파일 선택</button><input type="file" id="bannerFileInput" accept="image/*">
+        <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">App Title</label>
+        <div class="flex gap-2"><input type="text" id="newTitleInput" class="flex-1 p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-bold"><button id="saveTitleBtn" class="bg-blue-600 px-6 py-2 rounded-xl font-black">SAVE</button></div>
       </div>
-      <div class="flex justify-center mt-4"><button id="closeSettingsModalBtn" class="bg-gray-600 px-10 py-2 rounded-lg font-bold">닫기</button></div>
+      <div class="mb-10 text-left">
+        <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Banner Image</label>
+        <button id="triggerBannerBtn" class="w-full bg-gray-800 py-5 rounded-xl font-black border-2 border-dashed border-gray-700 text-gray-400 hover:text-white hover:border-blue-500 transition-all">UPLOAD JPG</button>
+        <input type="file" id="bannerFileInput" accept="image/*">
+      </div>
+      <div class="flex justify-center"><button id="closeSettingsModalBtn" class="bg-gray-800 px-12 py-3 rounded-2xl font-black text-gray-400 hover:text-white">CLOSE</button></div>
     </div>
   </div>
 
   <!-- 작품 상세보기 모달 -->
   <div id="imageModal" class="modal">
-    <div class="modal-content relative">
-      <button id="closeImageModalBtn" class="absolute top-4 right-4 text-white bg-black bg-opacity-60 rounded-full w-10 h-10 flex items-center justify-center z-50 text-2xl">✕</button>
-      <h3 id="modalComicNickname" class="text-3xl font-black mb-6 text-white text-center"></h3>
-      <div id="modalImageContainer" class="flex flex-col gap-6 max-w-xl mx-auto pb-10"></div>
+    <div class="modal-content relative bg-black border-none">
+      <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
+      <h3 id="modalComicNickname" class="text-3xl font-black mb-10 text-white text-center tracking-tighter"></h3>
+      <div id="modalImageContainer" class="flex flex-col gap-10 max-w-2xl mx-auto pb-20"></div>
     </div>
   </div>
 
-  <!-- 업로드 모달 -->
+  <!-- 업로드 모달 (요청하신 업로드 영역 업그레이드) -->
   <div id="uploadModal" class="modal">
-    <div class="modal-content w-full max-w-lg">
-      <h2 class="text-2xl font-black mb-8 text-center">작품 제출하기</h2>
-      <div class="mb-6"><label class="block text-sm font-bold text-gray-400 mb-2">작가 이름</label><input type="text" id="uploadNickname" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white font-bold" placeholder="닉네임을 적어주세요"></div>
-      <div class="mb-6"><label class="file-input-label py-4">이미지 선택 (여러 장)</label><input type="file" id="comicFilesInput" multiple accept="image/*"></div>
+    <div class="modal-content w-full max-w-xl">
+      <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
+      <div class="mb-8">
+        <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Author Name</label>
+        <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="활동 닉네임">
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Select Comics</label>
+        <!-- 💡 커스텀 파일 업로드 영역 -->
+        <div id="customFileUpload" class="custom-file-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          <span class="font-bold text-gray-400">이미지 파일을 여기에 놓거나 클릭하세요</span>
+          <span class="text-xs text-gray-600 font-medium">(여러 장 선택 가능)</span>
+        </div>
+        <input type="file" id="comicFilesInput" multiple accept="image/*" class="hidden">
+      </div>
       <div id="imagePreviewArea"></div>
-      <div class="flex justify-end gap-3 mt-10"><button id="cancelUploadBtn" class="bg-gray-700 px-8 py-3 rounded-xl font-bold">취소</button><button id="submitComicBtn" class="bg-blue-600 px-10 py-3 rounded-xl font-black">제출 완료</button></div>
+      <div class="flex justify-end gap-4 mt-12">
+        <button id="cancelUploadBtn" class="bg-gray-800 px-8 py-4 rounded-2xl font-black text-gray-400">취소</button>
+        <button id="submitComicBtn" class="bg-blue-600 hover:bg-blue-500 px-12 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/20">업로드 완료</button>
+      </div>
     </div>
   </div>
 
   <!-- 관리자 인증 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
-      <h2 id="passwordModalTitle" class="text-2xl font-black mb-6">인증 절차</h2>
-      <!-- 💡 Placeholder에서 비밀번호 힌트 제거 -->
-      <input type="password" id="generalPasswordInput" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white text-center mb-6 font-bold" placeholder="비밀번호를 입력하세요">
-      <div class="flex justify-center gap-3"><button id="closePasswordModalBtn" class="bg-gray-700 px-6 py-2 rounded-lg font-bold">취소</button><button id="confirmPasswordBtn" class="bg-blue-700 px-6 py-2 rounded-lg font-black">확인</button></div>
+      <h2 id="passwordModalTitle" class="text-2xl font-black mb-8">VERIFICATION</h2>
+      <input type="password" id="generalPasswordInput" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white text-center mb-8 font-black text-2xl tracking-widest">
+      <div class="flex justify-center gap-3"><button id="closePasswordModalBtn" class="bg-gray-800 px-6 py-2 rounded-xl font-bold">취소</button><button id="confirmPasswordBtn" class="bg-blue-600 px-6 py-2 rounded-xl font-black">확인</button></div>
     </div>
   </div>
 
-  <!-- 주제 설정 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black mb-6">제시어 입력</h2>
-      <input type="text" id="topicInput" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 text-white text-center mb-6 font-bold" placeholder="예: 첫사랑, 점심시간">
-      <div class="flex justify-center gap-3"><button id="closeTopicModalBtn" class="bg-gray-700 px-6 py-2 rounded-lg font-bold">취소</button><button id="submitTopicBtn" class="bg-blue-700 px-6 py-2 rounded-lg font-black">만투 시작!</button></div>
+      <h2 class="text-2xl font-black mb-8">SET TOPIC</h2>
+      <input type="text" id="topicInput" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white text-center mb-8 font-black text-xl" placeholder="대전 주제를 입력하세요">
+      <div class="flex justify-center gap-3"><button id="closeTopicModalBtn" class="bg-gray-800 px-6 py-2 rounded-xl font-bold">취소</button><button id="submitTopicBtn" class="bg-blue-600 px-6 py-2 rounded-xl font-black">START</button></div>
     </div>
   </div>
 
   <!-- 알림/로딩 -->
-  <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-xl font-bold mb-8"></p><button id="modal-confirm-btn" class="w-full py-3 bg-blue-700 rounded-xl font-black">알겠습니다</button></div></div>
-  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-500 border-t-transparent mb-6"></div><p id="loading-text" class="text-xl font-black text-blue-400">서버 작업 중...</p></div></div>
+  <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black">확인</button></div></div>
+  <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, deleteDoc, collection, onSnapshot, query, orderBy, serverTimestamp, setDoc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
@@ -233,7 +268,7 @@
     let state = { status: "", topic: "", comics: [], files: [], pending: null };
 
     const el = (id) => document.getElementById(id);
-    const showLoading = (show, text = "처리 중...") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
+    const showLoading = (show, text = "Processing...") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
 
     const showAlert = (msg) => {
       el('modal-message').textContent = msg;
@@ -250,7 +285,6 @@
         list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
       }
 
-      // 💡 '대전을 기다려 주세요' 문구를 제거하고 아무것도 표시하지 않음
       if (list.length === 0) return;
 
       list.forEach((c, i) => {
@@ -266,7 +300,20 @@
 
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
-        card.innerHTML = `${medal}<div class="content"><span class="nickname-display">${c.uploaderName}</span><span class="sub-text">${c.images?.length}컷</span></div><div class="info-footer"><div class="like-section"><button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}"><span>따봉</span></button><span class="like-count">${likes}</span></div></div>${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-bold">✕</button>` : ''}`;
+        card.innerHTML = `
+          ${medal}
+          <div class="content"><span class="nickname-display">${c.uploaderName}</span><span class="sub-text">${c.images?.length}컷 작품</span></div>
+          <div class="info-footer flex items-center">
+            <button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${hasLiked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+              </svg>
+              <span>${hasLiked ? '완료' : '따봉'}</span>
+            </button>
+            <span class="like-count">${likes}</span>
+          </div>
+          ${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs">✕</button>` : ''}
+        `;
         
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
@@ -279,7 +326,8 @@
           if (state.status === 'voting') toggleLike(c.id); 
           else showAlert(state.status === 'results' ? '투표가 종료되었습니다.' : '투표 기간이 아닙니다.'); 
         };
-        if (isOwner && card.querySelector('.del-btn')) card.querySelector('.del-btn').onclick = (e) => { e.stopPropagation(); handleDelete(c.id); };
+        const delBtn = card.querySelector('.del-btn');
+        if (delBtn) delBtn.onclick = (e) => { e.stopPropagation(); handleDelete(c.id); };
         grid.appendChild(card);
       });
     };
@@ -301,7 +349,7 @@
         else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = state.topic;
         el('currentTopicDisplay').classList.toggle('hidden', !state.topic);
-        refreshButtons();
+        refreshUI();
         renderComics();
       });
       onSnapshot(query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc")), (s) => {
@@ -310,12 +358,12 @@
       });
     };
 
-    const refreshButtons = () => {
+    const refreshUI = () => {
       const user = auth.currentUser;
       const isMgr = user && !user.isAnonymous;
-      el('userInfo').textContent = user ? (user.displayName || "관리자") : "방문자 모드";
+      el('userInfo').textContent = user ? (user.displayName || "GUEST MODE") : "OFFLINE";
       el('startContestBtn').classList.toggle('hidden', !isMgr || state.status !== "");
-      el('showUploadModalBtn').classList.toggle('hidden', !isMgr || state.status !== "uploading");
+      el('showUploadModalBtn').classList.toggle('hidden', state.status !== "uploading");
       el('endContestBtn').classList.toggle('hidden', !isMgr || state.status !== "uploading");
       el('startVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "upload_ended");
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
@@ -334,7 +382,7 @@
 
     const handleDelete = async (id) => {
       if (confirm("정말로 이 작품을 삭제하시겠습니까?")) {
-        showLoading(true, "작품 삭제 중...");
+        showLoading(true, "Deleting...");
         const c = state.comics.find(x => x.id === id);
         for (const img of c.images) if (img.path) await deleteObject(storageRef(storage, img.path)).catch(() => {});
         await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id));
@@ -368,21 +416,28 @@
       });
     };
 
-    el('comicFilesInput').onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
+    // 💡 이미지 업로드 영역 상호작용
+    const uploadInput = el('comicFilesInput');
+    const customUploadBtn = el('customFileUpload');
+    
+    customUploadBtn.onclick = () => uploadInput.click();
+    uploadInput.onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
+
     const renderPreviews = () => {
       const area = el('imagePreviewArea'); area.innerHTML = '';
       if (state.files.length === 0) return;
       state.files.forEach((f, i) => {
         const div = document.createElement('div'); div.className = 'preview-container';
-        div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="preview-image"><button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold shadow-lg">✕</button>`;
+        div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="preview-image"><button class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-black shadow-lg text-[10px]">✕</button>`;
         div.querySelector('button').onclick = () => { state.files.splice(i, 1); renderPreviews(); };
         area.appendChild(div);
       });
     };
 
     el('submitComicBtn').onclick = async () => {
-      const name = el('uploadNickname').value.trim(); if (!name || state.files.length === 0) return showAlert("닉네임과 이미지를 입력해주세요.");
-      showLoading(true, "이미지 최적화 및 전송 중...");
+      const name = el('uploadNickname').value.trim(); 
+      if (!name || state.files.length === 0) return showAlert("닉네임과 작품 사진을 확인해 주세요.");
+      showLoading(true, "Processing...");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
         for (let i = 0; i < state.files.length; i++) {
@@ -396,15 +451,16 @@
       } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
     };
 
-    el('openSettingsBtn').onclick = () => { state.pending = () => { el('newTitleInput').value = el('mainTitleDisplay').textContent; el('settingsModal').style.display = 'flex'; }; showPasswordModal("관리자 인증"); };
+    el('openSettingsBtn').onclick = () => { state.pending = () => { el('newTitleInput').value = el('mainTitleDisplay').textContent; el('settingsModal').style.display = 'flex'; }; showPasswordModal("ADMIN LOGIN"); };
     el('closeSettingsModalBtn').onclick = () => el('settingsModal').style.display = 'none';
     el('saveTitleBtn').onclick = async () => {
-      showLoading(true); await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: el('newTitleInput').value }, { merge: true });
+      showLoading(true, "Updating Title...");
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: el('newTitleInput').value }, { merge: true });
       showAlert("제목이 변경되었습니다."); showLoading(false);
     };
     el('triggerBannerBtn').onclick = () => el('bannerFileInput').click();
     el('bannerFileInput').onchange = async (e) => {
-      if (!e.target.files[0]) return; showLoading(true);
+      if (!e.target.files[0]) return; showLoading(true, "Uploading Banner...");
       try {
         const b = await resizeImg(e.target.files[0], 1920, 0.9);
         const sRef = storageRef(storage, `mantu/banners/${APP_ID}/main_${Date.now()}.jpg`);
@@ -415,7 +471,9 @@
 
     el('startContestBtn').onclick = () => { state.pending = () => el('topicModal').style.display = 'flex'; showPasswordModal("대전 시작"); };
     el('submitTopicBtn').onclick = async () => {
-      showLoading(true); await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic: el('topicInput').value, updatedAt: serverTimestamp() }, { merge: true });
+      const topic = el('topicInput').value.trim(); if(!topic) return;
+      showLoading(true, "Activating...");
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic: topic, updatedAt: serverTimestamp() }, { merge: true });
       el('topicModal').style.display = 'none'; showLoading(false);
     };
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
@@ -424,19 +482,23 @@
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
         if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
-          showLoading(true);
+          showLoading(true, "Cleaning...");
           for (const c of state.comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
           await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true }); showLoading(false);
         }
-      }; showPasswordModal("초기화");
+      }; showPasswordModal("데이터 초기화");
     };
 
-    // 💡 초기 실행
-    setupSync();
-    onAuthStateChanged(auth, (user) => {
-      refreshButtons();
-      renderComics();
-    });
+    // 💡 초기화 로직
+    const initApp = async () => {
+      try {
+        await signInAnonymously(auth); // 💡 규칙 준수: 쿼리 전 인증 호출
+      } catch (e) { console.error("Auth error:", e); }
+      setupSync();
+    };
+
+    initApp();
+    onAuthStateChanged(auth, refreshUI);
 
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
