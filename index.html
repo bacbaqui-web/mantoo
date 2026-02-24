@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <!-- ✅ 공유 시 표시되는 정보 -->
   <title>만투 프로젝트 - 만화로 맞짱뜨자!</title>
   <meta property="og:title" content="만투 프로젝트">
   <meta property="og:description" content="만화로 맞짱뜨자!">
@@ -122,27 +121,28 @@
     }
     .admin-button:hover { background: #1e293b; border-color: #64748b; }
 
-    /* ✅ 수정: 더 크게 강조된 타이머 디자인 */
+    /* 타이머 디자인 강화 */
     #timerContainer {
-      background: rgba(255, 255, 255, 0.03);
-      border: 2px solid rgba(239, 68, 68, 0.5);
-      padding: 20px 40px;
-      border-radius: 24px;
-      margin: 1.5rem 0;
+      background: rgba(239, 68, 68, 0.05);
+      border: 2px solid rgba(239, 68, 68, 0.4);
+      padding: 15px 30px;
+      border-radius: 20px;
+      margin: 1rem 0 2rem 0;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.1);
+      display: inline-block;
     }
-    #timerContainer:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; transform: scale(1.02); }
+    #timerContainer:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
     #timerDisplay { 
       font-family: 'Courier New', Courier, monospace; 
-      font-size: 3.5rem; 
+      font-size: 3.2rem; 
       font-weight: 900; 
       color: #ef4444; 
-      line-height: 1;
-      text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
     }
-    .timer-label { font-size: 0.75rem; font-weight: 900; color: #888; margin-bottom: 8px; letter-spacing: 0.2em; }
+    .timer-label { font-size: 0.7rem; font-weight: 900; color: #666; margin-bottom: 5px; letter-spacing: 0.3em; text-transform: uppercase; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -158,8 +158,8 @@
   </div>
 
   <!-- 메인 타이틀 영역 -->
-  <div class="w-full max-w-2xl flex items-center justify-center relative mb-8 px-12">
-    <h1 id="mainTitleDisplay" class="text-5xl font-black text-center text-white tracking-tighter italic">만투 프로젝트</h1>
+  <div class="w-full max-w-2xl flex items-center justify-center relative mb-8 px-12 text-center">
+    <h1 id="mainTitleDisplay" class="text-5xl font-black text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -172,15 +172,16 @@
     <img id="mainBanner" class="hidden w-full rounded-3xl shadow-2xl mb-10 object-cover border-4 border-[#1a1a1a]" alt="배너">
   </div>
 
-  <!-- ✅ 토픽 표시 영역 -->
-  <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 text-center mb-4 hidden">
-    TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
-  </h2>
+  <!-- 토픽 및 타이머 (통합 표시 영역) -->
+  <div class="w-full max-w-2xl text-center">
+    <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 mb-2 hidden">
+      TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
+    </h2>
 
-  <!-- ✅ 수정: 토픽 밑으로 이동된 대형 타이머 영역 -->
-  <div id="timerContainer" class="hidden text-center">
-    <p class="timer-label uppercase">작품 접수 마감까지</p>
-    <div id="timerDisplay">00 : 00 : 00</div>
+    <div id="timerContainer" class="hidden">
+      <p class="timer-label">UPLOAD DEADLINE</p>
+      <div id="timerDisplay">00 : 00 : 00</div>
+    </div>
   </div>
 
   <div id="comics-section" class="w-full max-w-6xl">
@@ -195,28 +196,33 @@
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 타이머 설정 모달 -->
-  <div id="timerSettingsModal" class="modal">
+  <!-- 통합 대전 시작 및 타이머 설정 모달 -->
+  <div id="topicModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black mb-8 tracking-tighter">TIMER SETTING</h2>
-      <div class="flex gap-4 mb-8 justify-center items-end">
-        <div class="flex-1">
-          <label class="block text-[10px] font-black text-gray-500 mb-2">MINUTES</label>
-          <input type="number" id="timerMinInput" value="30" class="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-2xl text-center">
-        </div>
-        <div class="text-3xl font-black pb-2 text-gray-700">:</div>
-        <div class="flex-1">
-          <label class="block text-[10px] font-black text-gray-500 mb-2">SECONDS</label>
-          <input type="number" id="timerSecInput" value="0" class="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-2xl text-center">
+      <h2 class="text-2xl font-black mb-8 tracking-tighter uppercase">START NEW CONTEST</h2>
+      
+      <div class="mb-8 text-left">
+        <label class="block text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">Contest Topic</label>
+        <input type="text" id="topicInput" class="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-lg" placeholder="대전 주제를 입력하세요">
+      </div>
+
+      <div class="mb-8 text-left">
+        <label class="block text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">Time Limit (Min : Sec)</label>
+        <div class="flex gap-3 items-center">
+          <input type="number" id="timerMinInput" value="30" class="flex-1 p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-xl text-center">
+          <span class="text-xl font-bold text-gray-700">:</span>
+          <input type="number" id="timerSecInput" value="0" class="flex-1 p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-xl text-center">
         </div>
       </div>
-      <div class="flex items-center justify-between mb-8 bg-gray-900 p-4 rounded-xl">
+
+      <div class="flex items-center justify-between mb-8 bg-gray-900 p-4 rounded-xl border border-gray-800">
         <span class="text-sm font-bold text-gray-400">종료 시 자동 마감</span>
         <input type="checkbox" id="autoEndCheck" class="w-6 h-6 rounded accent-red-600" checked>
       </div>
+
       <div class="flex justify-center gap-3">
-        <button id="closeTimerModalBtn" class="bg-gray-800 px-6 py-3 rounded-xl font-bold">취소</button>
-        <button id="saveTimerBtn" class="bg-red-600 px-6 py-3 rounded-xl font-black">START TIMER</button>
+        <button id="closeTopicModalBtn" class="bg-gray-800 px-6 py-3 rounded-xl font-bold text-gray-400">취소</button>
+        <button id="submitTopicBtn" class="bg-blue-600 px-8 py-3 rounded-xl font-black text-white">START CONTEST</button>
       </div>
     </div>
   </div>
@@ -246,14 +252,14 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 (닉네임 -> 작가명 수정) -->
+  <!-- 업로드 모달 (작가명으로 수정) -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-xl">
       <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
       <div class="mb-8">
         <!-- ✅ 수정: 활동 닉네임 -> 작가명 -->
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Author Name</label>
-        <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="작가명">
+        <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="작가명을 입력하세요">
       </div>
       <div class="mb-4">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Select Comics</label>
@@ -273,19 +279,12 @@
     </div>
   </div>
 
+  <!-- 비번 확인 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-2xl font-black mb-8">VERIFICATION</h2>
       <input type="password" id="generalPasswordInput" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white text-center mb-8 font-black text-2xl tracking-widest">
       <div class="flex justify-center gap-3"><button id="closePasswordModalBtn" class="bg-gray-800 px-6 py-2 rounded-xl font-bold">취소</button><button id="confirmPasswordBtn" class="bg-blue-600 px-6 py-2 rounded-xl font-black">확인</button></div>
-    </div>
-  </div>
-
-  <div id="topicModal" class="modal">
-    <div class="modal-content w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black mb-8">SET TOPIC</h2>
-      <input type="text" id="topicInput" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white text-center mb-8 font-black text-xl" placeholder="대전 주제를 입력하세요">
-      <div class="flex justify-center gap-3"><button id="closeTopicModalBtn" class="bg-gray-800 px-6 py-2 rounded-xl font-bold">취소</button><button id="submitTopicBtn" class="bg-blue-600 px-6 py-2 rounded-xl font-black">START</button></div>
     </div>
   </div>
 
@@ -315,7 +314,7 @@
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
-    let state = { status: "", topic: "", comics: [], files: [], pending: null, timerEnd: 0, autoEndUpload: false };
+    let state = { status: "", topic: "", comics: [], files: [], pending: null, timerEnd: 0, autoEndUpload: false, hasAutoEnded: false };
     let timerInterval = null;
 
     const el = (id) => document.getElementById(id);
@@ -333,8 +332,9 @@
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
 
-    // ✅ 수정: 초시계 포함 및 공백 있는 00 : 00 : 00 형식 타이머
+    // ✅ 대형 타이머 업데이트 로직
     const updateTimerDisplay = () => {
+      // 업로드 중일 때만 타이머 표시
       if (!state.timerEnd || state.status !== 'uploading') {
         el('timerContainer').classList.add('hidden');
         return;
@@ -346,8 +346,9 @@
 
       if (diff <= 0) {
         el('timerDisplay').textContent = "00 : 00 : 00";
+        // 자동 마감 설정이 켜져있고 아직 마감 처리 안했다면 실행
         if (state.autoEndUpload && state.status === 'uploading' && !state.hasAutoEnded) {
-          state.hasAutoEnded = true;
+          state.hasAutoEnded = true; 
           triggerAutoEnd();
         }
         return;
@@ -360,7 +361,11 @@
     };
 
     const triggerAutoEnd = async () => {
-      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true });
+      // 서버 상태를 '업로드 마감'으로 자동 변경
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { 
+        status: 'upload_ended', 
+        timerEnd: 0 
+      }, { merge: true });
     };
 
     const renderComics = () => {
@@ -429,7 +434,7 @@
         state.status = data.status || ""; state.topic = data.topic || "";
         state.timerEnd = data.timerEnd || 0;
         state.autoEndUpload = data.autoEndUpload || false;
-        state.hasAutoEnded = false;
+        state.hasAutoEnded = false; // 마감 상태 리셋
         
         setAppTitle(data.appTitle);
         
@@ -441,6 +446,7 @@
         
         refreshUI();
         renderComics();
+        updateTimerDisplay(); // 데이터 바뀔 때 즉시 반영
       });
       onSnapshot(query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc")), (s) => {
         state.comics = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -569,41 +575,41 @@
       } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
     };
 
-    // ✅ 타이머 클릭 -> 비밀번호 확인 -> 시간 설정 로직
-    el('timerContainer').onclick = () => {
-      state.pending = () => { el('timerSettingsModal').style.display = 'flex'; };
-      showPasswordModal("TIMER SETTING");
+    // ✅ 대전 시작 시 타이머까지 한꺼번에 설정
+    el('startContestBtn').onclick = () => { 
+      state.pending = () => el('topicModal').style.display = 'flex'; 
+      showPasswordModal("대전 시작 및 시간 설정"); 
     };
 
-    el('closeTimerModalBtn').onclick = () => { el('timerSettingsModal').style.display = 'none'; };
-    
-    el('saveTimerBtn').onclick = async () => {
+    el('closeTopicModalBtn').onclick = () => el('topicModal').style.display = 'none';
+
+    el('submitTopicBtn').onclick = async () => {
+      const topic = el('topicInput').value.trim();
       const min = parseInt(el('timerMinInput').value) || 0;
       const sec = parseInt(el('timerSecInput').value) || 0;
       const totalMs = (min * 60 + sec) * 1000;
       
-      if (totalMs <= 0) return alert("시간을 설정해주세요.");
+      if(!topic) return alert("주제를 입력하세요.");
+      if(totalMs <= 0) return alert("마감 시간을 설정하세요.");
+
+      showLoading(true, "대전 시작 중...");
       
       const timerEnd = Date.now() + totalMs;
       const autoEnd = el('autoEndCheck').checked;
-      
-      showLoading(true);
+
       await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { 
-        timerEnd: timerEnd, 
-        autoEndUpload: autoEnd 
+        status: 'uploading', 
+        topic: topic, 
+        timerEnd: timerEnd,
+        autoEndUpload: autoEnd,
+        updatedAt: serverTimestamp() 
       }, { merge: true });
       
-      el('timerSettingsModal').style.display = 'none';
+      el('topicModal').style.display = 'none'; 
       showLoading(false);
     };
 
-    el('startContestBtn').onclick = () => { state.pending = () => el('topicModal').style.display = 'flex'; showPasswordModal("대전 시작"); };
-    el('submitTopicBtn').onclick = async () => {
-      const topic = el('topicInput').value.trim(); if(!topic) return;
-      showLoading(true, "Activating...");
-      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic: topic, updatedAt: serverTimestamp() }, { merge: true });
-      el('topicModal').style.display = 'none'; showLoading(false);
-    };
+    // ✅ 기존 기능들 유지
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
     el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
@@ -615,6 +621,12 @@
           await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '', timerEnd: 0 }, { merge: true }); showLoading(false);
         }
       }; showPasswordModal("데이터 초기화");
+    };
+
+    // ✅ 타이머 영역 클릭하여 중간에 시간 수정하기 (비밀번호 0614)
+    el('timerContainer').onclick = () => {
+      state.pending = () => { el('topicModal').style.display = 'flex'; };
+      showPasswordModal("TIMER / TOPIC EDIT");
     };
 
     const initApp = async () => {
@@ -633,8 +645,6 @@
     el('cancelUploadBtn').onclick = () => el('uploadModal').style.display = 'none';
     el('closeImageModalBtn').onclick = () => el('imageModal').style.display = 'none';
     el('closePasswordModalBtn').onclick = () => el('generalPasswordModal').style.display = 'none';
-    el('closeTopicModalBtn').onclick = () => el('topicModal').style.display = 'none';
-    el('closeSettingsModalBtn').onclick = () => el('settingsModal').style.display = 'none';
   </script>
 </body>
 </html>
