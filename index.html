@@ -27,7 +27,6 @@
       letter-spacing: -0.025em;
     }
     
-    /* 메인 그리드 레이아웃 */
     #comic-grid { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
@@ -85,6 +84,7 @@
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.96); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     
+    /* ✅ 수정: 내부 스크롤 허용 (overflow-y: auto) */
     .modal-content { 
       background-color: #1a1a1a; 
       padding: 1.25rem; 
@@ -94,6 +94,7 @@
       width: 360px; 
       display: flex; 
       flex-direction: column;
+      overflow-y: auto; 
     }
     
     .timer-wrap {
@@ -119,6 +120,7 @@
     }
     .timer-label { font-size: 0.75rem; font-weight: 900; color: #777; margin-bottom: 6px; letter-spacing: 0.2em; text-transform: uppercase; }
     
+    /* 80px 썸네일 미리보기 */
     #imagePreviewArea { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, 80px); 
@@ -134,12 +136,6 @@
       transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
     .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
-    
-    .admin-button { 
-      background: #334155; color: white; padding: 12px 20px; border-radius: 12px; 
-      cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
-    }
-    .admin-button:hover { background: #1e293b; border-color: #64748b; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -242,14 +238,16 @@
     </div>
   </div>
 
+  <!-- 상세보기 모달 (주르륵 보기 위해 overflow-y: auto가 적용된 컨텐츠) -->
   <div id="imageModal" class="modal">
-    <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full">
+    <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full !overflow-y-auto">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
       <h3 id="modalComicNickname" class="text-2xl font-black p-6 text-white text-center tracking-tighter sticky top-0 bg-black/50 backdrop-blur-md z-10"></h3>
       <div id="modalImageContainer" class="flex flex-col gap-0 w-full pb-20"></div>
     </div>
   </div>
 
+  <!-- 작품 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full !max-w-xl !p-6" style="width: auto; min-width: 360px;">
       <h2 class="text-3xl font-black mb-8 text-center tracking-tight">작품 업로드</h2>
@@ -312,7 +310,7 @@
     let timerInterval = null;
 
     const el = (id) => document.getElementById(id);
-    const showLoading = (show, text = "Processing...") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
+    const showLoading = (show, text = \"Processing...\") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
 
     const showAlert = (msg) => {
       el('modal-message').innerHTML = msg;
@@ -321,7 +319,7 @@
     };
 
     const setAppTitle = (title) => {
-      const finalTitle = title || "만투 프로젝트";
+      const finalTitle = title || \"만투 프로젝트\";
       el('mainTitleDisplay').textContent = finalTitle;
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
@@ -337,7 +335,7 @@
       const now = Date.now();
       const diff = state.timerEnd - now;
       if (diff <= 0) {
-        el('timerDisplay').textContent = "00 : 00 : 00";
+        el('timerDisplay').textContent = \"00 : 00 : 00\";
         if (state.autoEndUpload && isUploadMode && !state.hasAutoEnded) {
           state.hasAutoEnded = true; 
           triggerAutoEnd();
@@ -364,34 +362,34 @@
         const likes = Object.keys(c.likes || {}).length;
         const hasLiked = auth.currentUser && c.likes?.[auth.currentUser.uid];
         const isOwner = auth.currentUser && c.uploaderId === auth.currentUser.uid;
-        let rankClass = "", medal = "";
+        let rankClass = \"\", medal = \"\";
         if (state.status === 'results' && i < 3) {
-          rankClass = `rank-${i + 1}`; medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
+          rankClass = `rank-${i + 1}`; medal = `<div class=\"rank-medal\">${['🥇', '🥈', '🥉'][i]}</div>`;
         }
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
         
-        // ✅ 수정: '00컷 작품' 문구 삭제
+        // '00컷 작품' 문구 삭제됨
         card.innerHTML = `
           ${medal}
-          <div class="content">
-            <span class="nickname-display">${c.uploaderName}</span>
+          <div class=\"content\">
+            <span class=\"nickname-display\">${c.uploaderName}</span>
           </div>
-          <div class="info-footer flex items-center">
-            <button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${hasLiked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+          <div class=\"info-footer flex items-center\">
+            <button class=\"like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}\">
+              <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"${hasLiked ? 'currentColor' : 'none'}\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">
+                <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5\" />
               </svg>
               <span>${hasLiked ? '완료' : '좋아요'}</span>
             </button>
-            <span class="like-count">${likes}</span>
+            <span class=\"like-count\">${likes}</span>
           </div>
-          ${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs">✕</button>` : ''}
+          ${isOwner && state.status !== 'results' ? `<button class=\"absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs\">✕</button>` : ''}
         `;
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
           if (state.status === 'uploading') return showAlert('마감 후에 작품이 공개됩니다.');
-          if (state.status === 'upload_ended') { state.pending = () => openViewer(c); showPasswordModal("관리자용 열람"); return; }
+          if (state.status === 'upload_ended') { state.pending = () => openViewer(c); showPasswordModal(\"관리자용 열람\"); return; }
           openViewer(c);
         };
         card.querySelector('.like-btn').onclick = (e) => { 
@@ -409,7 +407,7 @@
       el('modalComicNickname').textContent = `${c.uploaderName} 작가님`;
       const con = el('modalImageContainer'); con.innerHTML = '';
       c.images.forEach(img => { 
-        const i = document.createElement('img'); i.src = img.imageUrl; i.className = "w-full block"; con.appendChild(i); 
+        const i = document.createElement('img'); i.src = img.imageUrl; i.className = \"w-full block\"; con.appendChild(i); 
       });
       el('imageModal').style.display = 'flex';
     };
@@ -417,18 +415,18 @@
     const setupSync = () => {
       onSnapshot(doc(db, `artifacts/${APP_ID}/public/data/config/current`), (d) => {
         const data = d.data(); if (!data) return;
-        state.status = data.status || ""; state.topic = data.topic || "";
+        state.status = data.status || \"\"; state.topic = data.topic || \"\";
         state.timerEnd = data.timerEnd || 0;
         state.autoEndUpload = data.autoEndUpload || false;
         state.hasAutoEnded = false; 
         setAppTitle(data.appTitle);
-        if (data.bannerUrl && state.status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
+        if (data.bannerUrl && state.status === \"\") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = state.topic;
         el('currentTopicDisplay').classList.toggle('hidden', !state.topic);
         refreshUI(); renderComics(); updateTimerDisplay(); 
       });
-      onSnapshot(query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc")), (s) => {
+      onSnapshot(query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy(\"timestamp\", \"desc\")), (s) => {
         state.comics = s.docs.map(d => ({ id: d.id, ...d.data() }));
         renderComics();
       });
@@ -439,28 +437,28 @@
     const refreshUI = () => {
       const user = auth.currentUser;
       const isMgr = user && !user.isAnonymous;
-      el('userInfo').textContent = user ? (user.displayName || "GUEST MODE") : "OFFLINE";
-      el('startContestBtn').classList.toggle('hidden', !isMgr || state.status !== "");
-      el('showUploadModalBtn').classList.toggle('hidden', state.status !== "uploading");
-      el('endContestBtn').classList.toggle('hidden', !isMgr || state.status !== "uploading");
-      el('startVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "upload_ended");
-      el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
-      el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
+      el('userInfo').textContent = user ? (user.displayName || \"GUEST MODE\") : \"OFFLINE\";
+      el('startContestBtn').classList.toggle('hidden', !isMgr || state.status !== \"\");
+      el('showUploadModalBtn').classList.toggle('hidden', state.status !== \"uploading\");
+      el('endContestBtn').classList.toggle('hidden', !isMgr || state.status !== \"uploading\");
+      el('startVotingBtn').classList.toggle('hidden', !isMgr || state.status !== \"upload_ended\");
+      el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== \"voting\");
+      el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== \"results\");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
       el('signInBtn').classList.toggle('hidden', !!user && !user.isAnonymous);
       el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
-      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert(\"투표하려면 구글 로그인이 필요합니다.\");
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
-      if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만<br>할 수 있습니다!");
+      if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert(\"투표는 한 작품에만<br>할 수 있습니다!\");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
     };
 
     const handleDelete = async (id) => {
-      if (confirm("정말로 이 작품을 삭제하시겠습니까?")) {
-        showLoading(true, "Deleting...");
+      if (confirm(\"정말로 이 작품을 삭제하시겠습니까?\")) {
+        showLoading(true, \"Deleting...\");
         const c = state.comics.find(x => x.id === id);
         for (const img of c.images) if (img.path) await deleteObject(storageRef(storage, img.path)).catch(() => {});
         await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id));
@@ -474,7 +472,7 @@
 
     el('confirmPasswordBtn').onclick = () => {
       if (el('generalPasswordInput').value === ADMIN_PW) { el('generalPasswordModal').style.display = 'none'; if (state.pending) { state.pending(); state.pending = null; } }
-      else alert("비밀번호가 틀렸습니다.");
+      else alert(\"비밀번호가 틀렸습니다.\");
     };
 
     const resizeImg = (file, maxWidth = 1280, quality = 0.8) => {
@@ -513,17 +511,17 @@
       if (state.files.length === 0) return;
       state.files.forEach((f, i) => {
         const div = document.createElement('div'); div.className = 'preview-container';
-        div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="preview-image"><button class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-black shadow-lg text-[8px] z-10">✕</button>`;
+        div.innerHTML = `<img src=\"${URL.createObjectURL(f)}\" class=\"preview-image\"><button class=\"absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-black shadow-lg text-[8px] z-10\">✕</button>`;
         div.querySelector('button').onclick = () => { state.files.splice(i, 1); renderPreviews(); };
         area.appendChild(div);
       });
     };
 
     el('submitComicBtn').onclick = async () => {
-      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("업로드하려면 구글 로그인이 필요합니다.");
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert(\"업로드하려면 구글 로그인이 필요합니다.\");
       const name = el('uploadNickname').value.trim(); 
-      if (!name || state.files.length === 0) return showAlert("작가명을 입력해 주세요.");
-      showLoading(true, "Processing...");
+      if (!name || state.files.length === 0) return showAlert(\"작가명을 입력해 주세요.\");
+      showLoading(true, \"Processing...\");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
         for (let i = 0; i < state.files.length; i++) {
@@ -533,16 +531,16 @@
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
         await setDoc(ref, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: state.topic });
-        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 성공적으로<br>등록되었습니다!");
-      } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
+        el('uploadModal').style.display = 'none'; state.files = []; showAlert(\"작품이 성공적으로<br>등록되었습니다!\");
+      } catch (e) { showAlert(\"업로드 실패: \" + e.message); } showLoading(false);
     };
 
-    el('openSettingsBtn').onclick = () => { state.pending = () => { el('newTitleInput').value = el('mainTitleDisplay').textContent; el('settingsModal').style.display = 'flex'; }; showPasswordModal("ADMIN LOGIN"); };
+    el('openSettingsBtn').onclick = () => { state.pending = () => { el('newTitleInput').value = el('mainTitleDisplay').textContent; el('settingsModal').style.display = 'flex'; }; showPasswordModal(\"ADMIN LOGIN\"); };
     el('closeSettingsModalBtn').onclick = () => el('settingsModal').style.display = 'none';
     el('saveTitleBtn').onclick = async () => {
-      showLoading(true, "Updating...");
+      showLoading(true, \"Updating...\");
       await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { appTitle: el('newTitleInput').value }, { merge: true });
-      showAlert("제목이 변경되었습니다."); showLoading(false);
+      showAlert(\"제목이 변경되었습니다.\"); showLoading(false);
     };
     el('triggerBannerBtn').onclick = () => el('bannerFileInput').click();
     el('bannerFileInput').onchange = async (e) => {
@@ -551,13 +549,13 @@
         const b = await resizeImg(e.target.files[0], 1920, 0.9);
         const sRef = storageRef(storage, `mantu/banners/${APP_ID}/main_${Date.now()}.jpg`);
         await uploadBytesResumable(sRef, b); const url = await getDownloadURL(sRef);
-        await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true }); showAlert("배너 변경 완료");
-      } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
+        await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { bannerUrl: url }, { merge: true }); showAlert(\"배너 변경 완료\");
+      } catch (e) { showAlert(\"배너 업로드 실패\"); } showLoading(false);
     };
 
     el('startContestBtn').onclick = () => { 
-      state.pending = () => { el('topicInput').value = ""; el('timerHourInput').value = 0; el('timerMinInput').value = 30; el('topicModal').style.display = 'flex'; };
-      showPasswordModal("CONTEST SETTINGS"); 
+      state.pending = () => { el('topicInput').value = \"\"; el('timerHourInput').value = 0; el('timerMinInput').value = 30; el('topicModal').style.display = 'flex'; };
+      showPasswordModal(\"CONTEST SETTINGS\"); 
     };
 
     el('closeTopicModalBtn').onclick = () => el('topicModal').style.display = 'none';
@@ -567,8 +565,8 @@
       const hour = parseInt(el('timerHourInput').value) || 0;
       const min = parseInt(el('timerMinInput').value) || 0;
       const totalMs = (hour * 3600 + min * 60) * 1000;
-      if(!topic) return alert("주제를 입력하세요.");
-      if(totalMs <= 0) return alert("마감 시간을 설정하세요.");
+      if(!topic) return alert(\"주제를 입력하세요.\");
+      if(totalMs <= 0) return alert(\"마감 시간을 설정하세요.\");
       showLoading(true);
       const timerEnd = Date.now() + totalMs;
       const autoEnd = el('autoEndCheck').checked;
@@ -578,22 +576,22 @@
       el('topicModal').style.display = 'none'; showLoading(false);
     };
 
-    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true }); showPasswordModal("업로드 마감"); };
-    el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
+    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true }); showPasswordModal(\"업로드 마감\"); };
+    el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal(\"투표 시작\"); };
+    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal(\"결과 발표\"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
-        if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
-          showLoading(true, "Cleaning...");
-          for (const c of state.comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
+        if (confirm(\"정말로 모든 데이터를 초기화하시겠습니까?\")) {
+          showLoading(true, \"Cleaning...\");
+          for (const c of state.comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics\", c.id)); }
           await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '', timerEnd: 0 }, { merge: true }); showLoading(false);
         }
-      }; showPasswordModal("데이터 초기화");
+      }; showPasswordModal(\"데이터 초기화\");
     };
 
     el('timerContainer').onclick = () => {
       state.pending = () => { el('topicInput').value = state.topic; el('topicModal').style.display = 'flex'; };
-      showPasswordModal("CONTEST SETTINGS EDIT");
+      showPasswordModal(\"CONTEST SETTINGS EDIT\");
     };
 
     const initApp = async () => {
