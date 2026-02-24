@@ -132,15 +132,25 @@
     
     .custom-file-upload {
       border: 2px dashed #444; border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer;
-      transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
     .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
     
+    /* ✅ 수정: '업로드 마감' 등 관리자 버튼에서 박스 테두리 및 배경 제거 */
     .admin-button { 
-      background: #334155; color: white; padding: 12px 20px; border-radius: 12px; 
-      cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
+      background: transparent; 
+      color: #64748b; 
+      padding: 8px 12px; 
+      cursor: pointer; 
+      font-weight: 700; 
+      transition: all 0.2s ease; 
+      border: none;
+      text-decoration: underline; /* 텍스트임을 강조 */
+      text-underline-offset: 4px;
     }
-    .admin-button:hover { background: #1e293b; border-color: #64748b; }
+    .admin-button:hover { color: #efefef; }
+    .admin-button.text-red-400 { color: #f87171; }
+    .admin-button.text-red-400:hover { color: #ef4444; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -148,12 +158,14 @@
 </head>
 <body class="text-white">
 
+  <!-- 상단 인증 바 -->
   <div id="authBar" class="w-full max-w-5xl mx-auto flex items-center justify-end gap-3 mb-2 px-4">
     <span id="userInfo" class="text-xs font-bold text-gray-500 uppercase tracking-widest">Connect Wait...</span>
     <button id="signInBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">LOGIN</button>
     <button id="signOutBtn" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">LOGOUT</button>
   </div>
 
+  <!-- 메인 타이틀 영역 -->
   <div class="w-full max-w-2xl flex items-center justify-center relative mb-8 px-12 text-center">
     <h1 id="mainTitleDisplay" class="text-5xl font-black text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
@@ -174,15 +186,16 @@
     </h2>
     <div id="timerContainer" class="timer-wrap hidden">
       <p class="timer-label">UPLOAD DEADLINE</p>
-      <!-- ✅ 00 : 00 : 00 : 00 형식 -->
       <div id="timerDisplay">00 : 00 : 00 : 00</div>
     </div>
   </div>
 
   <div id="comics-section" class="w-full max-w-6xl">
-    <section class="text-center mb-12 flex flex-wrap justify-center gap-5">
+    <section class="text-center mb-12 flex flex-wrap justify-center gap-5 items-center">
       <button id="startContestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">대전 시작하기</button>
       <button id="showUploadModalBtn" class="bg-white hover:bg-gray-200 text-black font-black py-4 px-10 rounded-2xl text-xl shadow-xl transform transition active:scale-95 hidden">+ 작품 업로드</button>
+      
+      <!-- ✅ 관리자 버튼들: 이제 박스 없이 텍스트 링크 형태로 보임 -->
       <button id="endContestBtn" class="admin-button hidden">업로드 마감</button>
       <button id="startVotingBtn" class="admin-button hidden">투표 시작</button>
       <button id="endVotingBtn" class="admin-button hidden">결과 발표</button>
@@ -191,6 +204,7 @@
     <div id="comic-grid"></div>
   </div>
 
+  <!-- 통합 대전 설정 모달 -->
   <div id="topicModal" class="modal">
     <div class="modal-content">
       <h2 class="text-xl font-black mb-5 tracking-tighter uppercase text-center">CONTEST SETTINGS</h2>
@@ -221,6 +235,7 @@
     </div>
   </div>
 
+  <!-- 상세보기 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full !overflow-y-auto" style="height: 90vh;">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
@@ -229,6 +244,7 @@
     </div>
   </div>
 
+  <!-- 작품 업로드 모달 -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full !max-w-xl !p-6" style="width: auto; min-width: 360px;">
       <h2 class="text-3xl font-black mb-8 text-center tracking-tight">작품 업로드</h2>
@@ -323,7 +339,6 @@
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
 
-    // ✅ 타이머 업데이트 로직: 1/100초(밀리초) 단위 추가 및 긴박감 증대
     const updateTimerDisplay = () => {
       const isUploadMode = state.status === 'uploading';
       const container = el('timerContainer');
@@ -345,7 +360,7 @@
       const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
       const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
       const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      const ms = String(Math.floor((diff % 1000) / 10)).padStart(2, '0'); // ✅ 1/100초 계산
+      const ms = String(Math.floor((diff % 1000) / 10)).padStart(2, '0');
       el('timerDisplay').textContent = `${h} : ${m} : ${s} : ${ms}`;
     };
 
@@ -431,7 +446,7 @@
         renderComics();
       });
       if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(updateTimerDisplay, 50); // ✅ 밀리초 표시를 위해 50ms마다 갱신
+      timerInterval = setInterval(updateTimerDisplay, 50); 
     };
 
     const refreshUI = () => {
