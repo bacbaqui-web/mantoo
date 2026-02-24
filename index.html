@@ -62,6 +62,8 @@
       position: relative; border-radius: 14px 14px 0 0;
     }
     .comic-card .nickname-display { font-size: 1.4rem; font-weight: 900; color: #fff; word-break: break-all; }
+    /* ✅ 작품 제목 스타일 */
+    .comic-card .sub-text { font-size: 0.9rem; color: #aaa; margin-top: 8px; font-weight: 500; word-break: break-all; }
     .comic-card .info-footer { padding: 14px 18px; background: #222; text-align: left; border-radius: 0 0 14px 14px; }
     
     .rank-medal { 
@@ -84,7 +86,6 @@
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.96); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     
-    /* 콤팩트 설정 모달 디자인 */
     .modal-content { 
       background-color: #1a1a1a; 
       padding: 1.25rem; 
@@ -96,7 +97,6 @@
       flex-direction: column;
     }
     
-    /* 타이머 표시 제어 */
     .timer-wrap {
       background: rgba(239, 68, 68, 0.05);
       border: 2px solid rgba(239, 68, 68, 0.4);
@@ -120,7 +120,6 @@
     }
     .timer-label { font-size: 0.75rem; font-weight: 900; color: #777; margin-bottom: 6px; letter-spacing: 0.2em; text-transform: uppercase; }
     
-    /* 썸네일 미리보기 조그맣게 고정 */
     #imagePreviewArea { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, 80px); 
@@ -215,23 +214,32 @@
     </div>
   </div>
 
-  <!-- 상세보기 모달: 세로 스택형 주르륵 보기 및 스크롤 활성화 -->
   <div id="imageModal" class="modal">
-    <!-- max-width를 늘리고 스크롤 가능하게 수정 -->
-    <div class="modal-content relative bg-black border-none !p-0 !max-w-4xl w-full !overflow-y-auto" style="height: 90vh;">
+    <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full !overflow-y-auto" style="height: 90vh;">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
       <h3 id="modalComicNickname" class="text-2xl font-black p-6 text-white text-center tracking-tighter sticky top-0 bg-black/50 backdrop-blur-md z-10"></h3>
       <div id="modalImageContainer" class="flex flex-col gap-0 w-full pb-20"></div>
     </div>
   </div>
 
+  <!-- ✅ 작품 업로드 모달 (작품 제목 추가) -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full !max-w-xl !p-6" style="width: auto; min-width: 360px;">
       <h2 class="text-3xl font-black mb-8 text-center tracking-tight">작품 업로드</h2>
-      <div class="mb-6 text-left">
+      
+      <!-- 작가명 입력 -->
+      <div class="mb-5 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest font-bold">작가명</label>
         <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl focus:border-blue-500 outline-none" placeholder="작가명을 입력하세요">
       </div>
+
+      <!-- ✅ 작품 제목 입력 추가 -->
+      <div class="mb-6 text-left">
+        <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest font-bold">작품 제목</label>
+        <input type="text" id="uploadComicTitle" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl focus:border-blue-500 outline-none" placeholder="작품 제목을 입력하세요">
+      </div>
+
+      <!-- 작품 선택 -->
       <div class="mb-4 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest font-bold">작품 선택</label>
         <div id="customFileUpload" class="custom-file-upload">
@@ -242,6 +250,7 @@
         </div>
         <input type="file" id="comicFilesInput" multiple accept="image/*" class="hidden">
       </div>
+
       <div id="imagePreviewArea"></div>
       <div class="flex justify-end gap-4 mt-8">
         <button id="cancelUploadBtn" class="bg-gray-800 px-8 py-4 rounded-2xl font-black text-gray-400">취소</button>
@@ -250,7 +259,7 @@
     </div>
   </div>
 
-  <!-- 알림/로딩/인증 모달들 (생략 없음) -->
+  <!-- 관리자 센터 및 인증 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center !p-6">
       <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
@@ -361,11 +370,12 @@
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
         
-        // '00컷 작품' 문구 삭제
+        // ✅ 카드 내용 수정: 작가명 아래에 '작품 제목' 표시
         card.innerHTML = `
           ${medal}
           <div class="content">
             <span class="nickname-display">${c.uploaderName}</span>
+            <span class="sub-text">${c.title || ''}</span>
           </div>
           <div class="info-footer flex items-center">
             <button class="like-btn ${hasLiked ? 'liked' : ''} ${state.status !== 'voting' ? 'disabled' : ''}">
@@ -376,7 +386,7 @@
             </button>
             <span class="like-count">${likes}</span>
           </div>
-          ${isOwner && state.status !== 'results' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs">✕</button>` : ''}
+          ${isOwner && state.status === 'uploading' ? `<button class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-9 h-9 flex items-center justify-center z-50 shadow-xl del-btn font-black text-xs">✕</button>` : ''}
         `;
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
@@ -484,7 +494,6 @@
       });
     };
 
-    // 이미지 업로드 및 드래그 앤 드롭 복구
     const uploadInput = el('comicFilesInput');
     const customUploadBtn = el('customFileUpload');
     customUploadBtn.onclick = () => uploadInput.click();
@@ -511,8 +520,12 @@
 
     el('submitComicBtn').onclick = async () => {
       if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("업로드하려면 구글 로그인이 필요합니다.");
+      
       const name = el('uploadNickname').value.trim(); 
-      if (!name || state.files.length === 0) return showAlert("작가명을 입력해 주세요.");
+      const comicTitle = el('uploadComicTitle').value.trim(); // ✅ 작품 제목 가져오기
+      
+      if (!name || !comicTitle || state.files.length === 0) return showAlert("작가명, 작품 제목, 이미지를 모두 확인해 주세요.");
+      
       showLoading(true, "Processing...");
       try {
         const ref = doc(collection(db, "artifacts", APP_ID, "public", "data", "comics")); const imgs = [];
@@ -522,8 +535,22 @@
           const sRef = storageRef(storage, path); await uploadBytesResumable(sRef, blob);
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
-        await setDoc(ref, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: state.topic });
-        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 성공적으로<br>등록되었습니다!");
+        // ✅ title 필드 추가하여 저장
+        await setDoc(ref, { 
+          uploaderId: auth.currentUser.uid, 
+          uploaderName: name, 
+          title: comicTitle, 
+          images: imgs, 
+          likes: {}, 
+          timestamp: serverTimestamp(), 
+          topic: state.topic 
+        });
+        
+        el('uploadModal').style.display = 'none'; 
+        el('uploadNickname').value = '';
+        el('uploadComicTitle').value = '';
+        state.files = []; 
+        showAlert("작품이 성공적으로<br>등록되었습니다!");
       } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
     };
 
