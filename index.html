@@ -27,6 +27,7 @@
       letter-spacing: -0.025em;
     }
     
+    /* 메인 그리드 레이아웃 */
     #comic-grid { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
@@ -39,6 +40,7 @@
     @media (min-width: 1024px) { #comic-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (min-width: 1280px) { #comic-grid { grid-template-columns: repeat(5, 1fr); } }
     
+    /* ✅ 카드 디자인 복구: 예전 크기 그대로 보일 수 있게 높이와 스타일 유지 */
     .comic-card { 
       position: relative; 
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -53,6 +55,18 @@
     }
     .comic-card.disabled { cursor: not-allowed; opacity: 0.8; }
     .comic-card.rank-1 { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); scale: 1.05; z-index: 10; }
+    .comic-card.rank-2 { border-color: #94a3b8; }
+    .comic-card.rank-3 { border-color: #92400e; }
+
+    /* ✅ 카드 내부 스타일 복구 (누락되었던 부분) */
+    .comic-card .content { 
+      display: flex; flex-direction: column; justify-content: center; align-items: center; 
+      width: 100%; min-height: 140px; padding: 24px; text-align: center; background-color: #1a1a1a; 
+      position: relative; border-radius: 14px 14px 0 0;
+    }
+    .comic-card .nickname-display { font-size: 1.4rem; font-weight: 900; color: #fff; word-break: break-all; }
+    .comic-card .sub-text { font-size: 0.9rem; color: #888; margin-top: 8px; font-weight: 500; }
+    .comic-card .info-footer { padding: 14px 18px; background: #222; text-align: left; border-radius: 0 0 14px 14px; }
     
     .rank-medal { 
       position: absolute; top: -35px; left: -25px; font-size: 4.5rem; line-height: 1; 
@@ -70,9 +84,11 @@
       transition: all 0.2s ease; cursor: pointer; border: none; 
     }
     .like-btn.liked { background: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+    .like-count { font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-left: auto; }
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.96); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     
+    /* 설정 모달: 스크롤 없이 콤팩트하게 */
     .modal-content { 
       background-color: #1a1a1a; 
       padding: 1.25rem; 
@@ -84,6 +100,7 @@
       flex-direction: column;
     }
     
+    /* 타이머 디자인 */
     .timer-wrap {
       background: rgba(239, 68, 68, 0.05);
       border: 2px solid rgba(239, 68, 68, 0.4);
@@ -96,7 +113,6 @@
       display: inline-block;
     }
     .timer-wrap.hidden { display: none !important; }
-
     #timerDisplay { 
       font-family: 'Courier New', Courier, monospace; 
       font-size: 3.2rem; 
@@ -107,6 +123,7 @@
     }
     .timer-label { font-size: 0.75rem; font-weight: 900; color: #777; margin-bottom: 6px; letter-spacing: 0.2em; text-transform: uppercase; }
     
+    /* ✅ 업로드 미리보기 이미지 조그맣게 고정 (80px) */
     #imagePreviewArea { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, 80px); 
@@ -118,9 +135,16 @@
     .preview-image { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #333; }
     
     .custom-file-upload {
-      border: 2px dashed #444; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer;
-      transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 12px;
+      border: 2px dashed #444; border-radius: 20px; padding: 25px 20px; text-align: center; cursor: pointer;
+      transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
+    .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
+    
+    .admin-button { 
+      background: #334155; color: white; padding: 12px 20px; border-radius: 12px; 
+      cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
+    }
+    .admin-button:hover { background: #1e293b; border-color: #64748b; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -140,7 +164,7 @@
     <h1 id="mainTitleDisplay" class="text-5xl font-black text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     </button>
@@ -225,6 +249,7 @@
     </div>
   </div>
 
+  <!-- 작품 상세보기 모달 -->
   <div id="imageModal" class="modal">
     <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
@@ -233,9 +258,9 @@
     </div>
   </div>
 
-  <!-- 작품 업로드 모달 -->
+  <!-- ✅ 작품 업로드 모달 (작가명 및 미리보기 크기 최적화) -->
   <div id="uploadModal" class="modal">
-    <div class="modal-content w-full !max-w-xl !p-6">
+    <div class="modal-content w-full !max-w-xl !p-6" style="width: auto; min-width: 360px;">
       <h2 class="text-3xl font-black mb-8 text-center tracking-tight">작품 업로드</h2>
       <div class="mb-6 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest font-bold">작가명</label>
@@ -243,14 +268,16 @@
       </div>
       <div class="mb-4 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest font-bold">작품 선택</label>
+        <!-- 💡 드래그 앤 드롭 영역 -->
         <div id="customFileUpload" class="custom-file-upload">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-10 h-10">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-8 h-8 text-gray-600">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
-          <span class="font-bold text-gray-400 text-xs">이미지 파일을 여기에 놓거나 클릭하세요</span>
+          <span class="font-bold text-gray-400 text-[11px]">이미지 파일을 여기에 놓거나 클릭하세요</span>
         </div>
         <input type="file" id="comicFilesInput" multiple accept="image/*" class="hidden">
       </div>
+      <!-- ✅ 80px 썸네일 미리보기 영역 -->
       <div id="imagePreviewArea"></div>
       <div class="flex justify-end gap-4 mt-8">
         <button id="cancelUploadBtn" class="bg-gray-800 px-8 py-4 rounded-2xl font-black text-gray-400">취소</button>
@@ -354,7 +381,8 @@
         const isOwner = auth.currentUser && c.uploaderId === auth.currentUser.uid;
         let rankClass = "", medal = "";
         if (state.status === 'results' && i < 3) {
-          rankClass = `rank-${i + 1}`; medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
+          rankClass = `rank-${i + 1}`; 
+          medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
         }
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
@@ -478,31 +506,18 @@
       });
     };
 
-    // 💡 이미지 업로드 및 드래그 앤 드롭 복구
+    // ✅ 이미지 업로드 및 드래그 앤 드롭 유지
     const uploadInput = el('comicFilesInput');
     const customUploadBtn = el('customFileUpload');
-    
     customUploadBtn.onclick = () => uploadInput.click();
     
-    // ✅ 드래그 앤 드롭 이벤트 리스너 추가
-    customUploadBtn.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      customUploadBtn.style.borderColor = '#3b82f6';
-      customUploadBtn.style.background = '#262626';
-    });
-    customUploadBtn.addEventListener('dragleave', () => {
-      customUploadBtn.style.borderColor = '#444';
-      customUploadBtn.style.background = '#222';
-    });
+    customUploadBtn.addEventListener('dragover', (e) => { e.preventDefault(); customUploadBtn.style.borderColor = '#3b82f6'; customUploadBtn.style.background = '#262626'; });
+    customUploadBtn.addEventListener('dragleave', () => { customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222'; });
     customUploadBtn.addEventListener('drop', (e) => {
       e.preventDefault();
-      customUploadBtn.style.borderColor = '#444';
-      customUploadBtn.style.background = '#222';
+      customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222';
       const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-      if (droppedFiles.length > 0) {
-        state.files = [...state.files, ...droppedFiles];
-        renderPreviews();
-      }
+      if (droppedFiles.length > 0) { state.files = [...state.files, ...droppedFiles]; renderPreviews(); }
     });
 
     uploadInput.onchange = (e) => { state.files = [...state.files, ...Array.from(e.target.files)]; renderPreviews(); };
@@ -521,7 +536,7 @@
     el('submitComicBtn').onclick = async () => {
       if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("업로드하려면 구글 로그인이 필요합니다.");
       const name = el('uploadNickname').value.trim(); 
-      if (!name || state.files.length === 0) return showAlert("작가명과 작품 사진을 확인해 주세요.");
+      if (!name || state.files.length === 0) return showAlert("작가명을 입력해 주세요.");
       showLoading(true, "Processing...");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
