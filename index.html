@@ -121,8 +121,8 @@
     }
     .admin-button:hover { background: #1e293b; border-color: #64748b; }
 
-    /* 타이머 디자인 */
-    #timerContainer {
+    /* ✅ 수정: ID 선택자 대신 클래스로 관리하여 .hidden이 작동하도록 수정 */
+    .timer-wrap {
       background: rgba(239, 68, 68, 0.05);
       border: 2px solid rgba(239, 68, 68, 0.4);
       padding: 15px 40px;
@@ -133,7 +133,7 @@
       box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
       display: inline-block;
     }
-    #timerContainer:hover { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); transform: scale(1.02); }
+    .timer-wrap:hover { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); transform: scale(1.02); }
     #timerDisplay { 
       font-family: 'Courier New', Courier, monospace; 
       font-size: 3.5rem; 
@@ -162,7 +162,7 @@
     <h1 id="mainTitleDisplay" class="text-5xl font-black text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     </button>
@@ -173,14 +173,13 @@
   </div>
 
   <div class="w-full max-w-2xl text-center">
-    <!-- 토픽 표시 -->
     <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 mb-2 hidden">
       TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
     </h2>
 
-    <!-- ✅ 대형 타이머 (업로드 중에만 노출) -->
-    <div id="timerContainer" class="hidden">
-      <p class="timer-label">UPLOAD DEADLINE</p>
+    <!-- ✅ 수정: ID 대신 클래스 'timer-wrap' 사용 -->
+    <div id="timerContainer" class="timer-wrap hidden">
+      <p class="timer-label">작품 접수 마감까지</p>
       <div id="timerDisplay">00 : 00 : 00</div>
     </div>
   </div>
@@ -223,7 +222,6 @@
 
       <div class="flex justify-center gap-3">
         <button id="closeTopicModalBtn" class="bg-gray-800 px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white transition-colors">취소</button>
-        <!-- ✅ 버튼 텍스트 '설정' -->
         <button id="submitTopicBtn" class="bg-blue-600 px-10 py-3 rounded-xl font-black text-white hover:bg-blue-500 transition-colors shadow-lg">설정</button>
       </div>
     </div>
@@ -255,12 +253,11 @@
     </div>
   </div>
 
-  <!-- 업로드 모달 (닉네임 -> 작가명 수정) -->
+  <!-- 업로드 모달 (작가명) -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-xl">
       <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
       <div class="mb-8">
-        <!-- ✅ 라벨 및 플레이스홀더 수정 -->
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Author Name</label>
         <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="작가명을 입력하세요">
       </div>
@@ -290,7 +287,6 @@
     </div>
   </div>
 
-  <!-- 알림/로딩 -->
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black shadow-lg">확인</button></div></div>
   <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8 shadow-2xl shadow-blue-600/20"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
 
@@ -334,10 +330,10 @@
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
 
-    // ✅ 타이머 업데이트 로직 (업로드 중에만 노출)
     const updateTimerDisplay = () => {
       const isUploadMode = state.status === 'uploading';
       
+      // ✅ 상태가 uploading이 아니거나 시간이 설정되지 않았으면 타이머 숨김
       if (!state.timerEnd || !isUploadMode) {
         el('timerContainer').classList.add('hidden');
         return;
@@ -576,9 +572,13 @@
       } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
     };
 
-    // ✅ 대전 시작 (콤팩트 설정창)
     el('startContestBtn').onclick = () => { 
-      state.pending = () => el('topicModal').style.display = 'flex'; 
+      state.pending = () => {
+        el('topicInput').value = "";
+        el('timerHourInput').value = 0;
+        el('timerMinInput').value = 30;
+        el('topicModal').style.display = 'flex'; 
+      };
       showPasswordModal("CONTEST SETTINGS"); 
     };
 
@@ -622,7 +622,6 @@
       }; showPasswordModal("데이터 초기화");
     };
 
-    // 타이머 클릭하여 수정
     el('timerContainer').onclick = () => {
       state.pending = () => { 
         el('topicInput').value = state.topic;
