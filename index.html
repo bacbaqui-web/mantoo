@@ -26,14 +26,6 @@
       gap: 1.5rem;
       letter-spacing: -0.025em;
     }
-    .section-card {
-      background: #161616;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      width: 100%;
-      max-width: 1200px;
-    }
     
     #comic-grid { 
       display: grid; 
@@ -60,68 +52,47 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     .comic-card.disabled { cursor: not-allowed; opacity: 0.8; }
-    
     .comic-card.rank-1 { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); scale: 1.05; z-index: 10; }
-    .comic-card.rank-2 { border-color: #94a3b8; }
-    .comic-card.rank-3 { border-color: #92400e; }
     
     .rank-medal { 
       position: absolute; top: -35px; left: -25px; font-size: 4.5rem; line-height: 1; 
       text-shadow: 0 4px 20px rgba(0,0,0,1); z-index: 100; 
       animation: winner-bounce 2.5s infinite ease-in-out;
-      filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
     }
     @keyframes winner-bounce {
       0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
       50% { transform: translateY(-12px) rotate(5deg) scale(1.1); }
     }
 
-    .comic-card:not(.disabled):hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); background: #2a2a2a; }
-    
-    .comic-card .content { 
-      display: flex; flex-direction: column; justify-content: center; align-items: center; 
-      width: 100%; min-height: 140px; padding: 24px; text-align: center; background-color: #1a1a1a; 
-      position: relative; border-radius: 14px 14px 0 0;
-    }
-    .comic-card .nickname-display { font-size: 1.4rem; font-weight: 900; color: #fff; word-break: break-all; }
-    .comic-card .sub-text { font-size: 0.9rem; color: #888; margin-top: 8px; font-weight: 500; }
-    .comic-card .info-footer { padding: 14px 18px; background: #222; text-align: left; border-radius: 0 0 14px 14px; }
-    
     .like-btn { 
       display: flex; align-items: center; gap: 8px; background: #333; color: white; 
       padding: 10px 18px; border-radius: 24px; font-size: 0.95rem; font-weight: 700; 
       transition: all 0.2s ease; cursor: pointer; border: none; 
     }
     .like-btn.liked { background: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
-    .like-btn:not(.disabled):hover:not(.liked) { background: #444; }
-    .like-count { font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-left: auto; }
 
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,.96); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
+    
+    /* ✅ 수정: 스크롤 방지를 위해 패딩 및 레이아웃 최적화 */
     .modal-content { 
-      background-color: #1a1a1a; padding: 1.5rem; border-radius: 24px; border: 1px solid #333;
-      max-width: 95vw; max-height: 92vh; width: auto; display: flex; flex-direction: column; overflow-y: auto; 
+      background-color: #1a1a1a; 
+      padding: 1.25rem; 
+      border-radius: 24px; 
+      border: 1px solid #333;
+      max-width: 90vw; 
+      max-height: 95vh; 
+      width: 380px; 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
     }
     
     .custom-file-upload {
       border: 2px dashed #444; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer;
       transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
-    .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
-    .custom-file-upload svg { color: #666; width: 48px; height: 48px; transition: color 0.3s ease; }
-    .custom-file-upload:hover svg { color: #3b82f6; }
     
-    #imagePreviewArea { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; margin-top: 1.5rem; }
-    .preview-container { position: relative; width: 100%; aspect-ratio: 1 / 1; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; scale: 0.9; } to { opacity: 1; scale: 1; } }
-    .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #333; }
-    
-    .admin-button { 
-      background: #334155; color: white; padding: 12px 20px; border-radius: 12px; 
-      cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
-    }
-    .admin-button:hover { background: #1e293b; border-color: #64748b; }
-
-    /* ✅ 수정: ID 선택자 대신 클래스로 관리하여 .hidden이 작동하도록 수정 */
+    /* 타이머 랩퍼 */
     .timer-wrap {
       background: rgba(239, 68, 68, 0.05);
       border: 2px solid rgba(239, 68, 68, 0.4);
@@ -133,7 +104,6 @@
       box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
       display: inline-block;
     }
-    .timer-wrap:hover { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); transform: scale(1.02); }
     #timerDisplay { 
       font-family: 'Courier New', Courier, monospace; 
       font-size: 3.5rem; 
@@ -162,7 +132,7 @@
     <h1 id="mainTitleDisplay" class="text-5xl font-black text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     </button>
@@ -177,9 +147,9 @@
       TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
     </h2>
 
-    <!-- ✅ 수정: ID 대신 클래스 'timer-wrap' 사용 -->
+    <!-- ✅ 타이머 영역: 업로드 단계에서만 노출 -->
     <div id="timerContainer" class="timer-wrap hidden">
-      <p class="timer-label">작품 접수 마감까지</p>
+      <p class="timer-label">UPLOAD DEADLINE</p>
       <div id="timerDisplay">00 : 00 : 00</div>
     </div>
   </div>
@@ -196,38 +166,45 @@
     <div id="comic-grid"></div>
   </div>
 
-  <!-- 통합 대전 설정 모달 (Hour : Min / 콤팩트 디자인) -->
+  <!-- ✅ 통합 설정 모달: 스크롤 없이 한눈에 보이도록 최적화 -->
   <div id="topicModal" class="modal">
-    <div class="modal-content w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black mb-6 tracking-tighter uppercase">CONTEST SETTINGS</h2>
+    <div class="modal-content">
+      <h2 class="text-xl font-black mb-5 tracking-tighter uppercase text-center">CONTEST SETTINGS</h2>
       
-      <div class="mb-5 text-left">
-        <label class="block text-[10px] font-black text-gray-500 mb-1.5 uppercase tracking-widest">Contest Topic</label>
-        <input type="text" id="topicInput" class="w-full p-3 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-lg focus:border-blue-500 outline-none" placeholder="대전 주제를 입력하세요">
+      <!-- 주제 입력 -->
+      <div class="mb-4 text-left">
+        <label class="block text-[10px] font-black text-gray-500 mb-1 uppercase tracking-widest">Contest Topic</label>
+        <input type="text" id="topicInput" class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-base focus:border-blue-500 outline-none" placeholder="대전 주제를 입력하세요">
       </div>
 
-      <div class="mb-5 text-left">
-        <label class="block text-[10px] font-black text-gray-500 mb-1.5 uppercase tracking-widest">Time Limit (Hour : Min)</label>
+      <!-- ✅ 시간 설정: 좌우 크기 동일하게 맞춤 (5:5 비율) -->
+      <div class="mb-4 text-left">
+        <label class="block text-[10px] font-black text-gray-500 mb-1 uppercase tracking-widest">Time Limit (Hour : Min)</label>
         <div class="flex gap-2 items-center">
-          <input type="number" id="timerHourInput" value="0" min="0" class="flex-1 p-3 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-xl text-center focus:border-red-500 outline-none">
+          <div class="flex-1">
+            <input type="number" id="timerHourInput" value="0" min="0" class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-lg text-center focus:border-red-500 outline-none">
+          </div>
           <span class="text-xl font-bold text-gray-700">:</span>
-          <input type="number" id="timerMinInput" value="30" min="0" max="59" class="flex-1 p-3 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-xl text-center focus:border-red-500 outline-none">
+          <div class="flex-1">
+            <input type="number" id="timerMinInput" value="30" min="0" max="59" class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-lg text-center focus:border-red-500 outline-none">
+          </div>
         </div>
       </div>
 
-      <div class="flex items-center justify-between mb-6 bg-gray-900/50 p-3 rounded-xl border border-gray-800">
-        <span class="text-sm font-bold text-gray-400">종료 시 자동 마감</span>
-        <input type="checkbox" id="autoEndCheck" class="w-6 h-6 rounded accent-red-600 cursor-pointer" checked>
+      <!-- 자동 마감 옵션 -->
+      <div class="flex items-center justify-between mb-6 bg-gray-900/50 p-2.5 rounded-xl border border-gray-800">
+        <span class="text-xs font-bold text-gray-400">종료 시 자동 마감</span>
+        <input type="checkbox" id="autoEndCheck" class="w-5 h-5 rounded accent-red-600 cursor-pointer" checked>
       </div>
 
-      <div class="flex justify-center gap-3">
-        <button id="closeTopicModalBtn" class="bg-gray-800 px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white transition-colors">취소</button>
-        <button id="submitTopicBtn" class="bg-blue-600 px-10 py-3 rounded-xl font-black text-white hover:bg-blue-500 transition-colors shadow-lg">설정</button>
+      <div class="flex justify-center gap-2">
+        <button id="closeTopicModalBtn" class="flex-1 bg-gray-800 py-3 rounded-xl font-bold text-gray-400 hover:text-white transition-colors">취소</button>
+        <button id="submitTopicBtn" class="flex-[1.5] bg-blue-600 py-3 rounded-xl font-black text-white hover:bg-blue-500 transition-colors shadow-lg">설정</button>
       </div>
     </div>
   </div>
 
-  <!-- 관리자 설정 모달 -->
+  <!-- 관리자 센터 (원본 유지) -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
       <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
@@ -244,9 +221,8 @@
     </div>
   </div>
 
-  <!-- 이미지 상세 보기 모달 -->
   <div id="imageModal" class="modal">
-    <div class="modal-content relative bg-black border-none !p-0 max-w-4xl">
+    <div class="modal-content relative bg-black border-none !p-0 max-w-4xl w-full">
       <button id="closeImageModalBtn" class="fixed top-8 right-8 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full w-14 h-14 flex items-center justify-center z-50 text-3xl transition-all">✕</button>
       <h3 id="modalComicNickname" class="text-2xl font-black p-6 text-white text-center tracking-tighter sticky top-0 bg-black/50 backdrop-blur-md z-10"></h3>
       <div id="modalImageContainer" class="flex flex-col gap-0 w-full pb-20"></div>
@@ -255,16 +231,16 @@
 
   <!-- 업로드 모달 (작가명) -->
   <div id="uploadModal" class="modal">
-    <div class="modal-content w-full max-w-xl">
-      <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
-      <div class="mb-8">
+    <div class="modal-content w-full !max-w-xl !p-6">
+      <h2 class="text-3xl font-black mb-8 text-center tracking-tight">작품 업로드</h2>
+      <div class="mb-6 text-left">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Author Name</label>
         <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="작가명을 입력하세요">
       </div>
       <div class="mb-4">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Select Comics</label>
         <div id="customFileUpload" class="custom-file-upload">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-12 h-12">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           <span class="font-bold text-gray-400 text-sm">이미지 파일을 여기에 놓거나 클릭하세요</span>
@@ -272,13 +248,14 @@
         <input type="file" id="comicFilesInput" multiple accept="image/*" class="hidden">
       </div>
       <div id="imagePreviewArea"></div>
-      <div class="flex justify-end gap-4 mt-12">
+      <div class="flex justify-end gap-4 mt-8">
         <button id="cancelUploadBtn" class="bg-gray-800 px-8 py-4 rounded-2xl font-black text-gray-400">취소</button>
-        <button id="submitComicBtn" class="bg-blue-600 hover:bg-blue-500 px-12 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/20">업로드 완료</button>
+        <button id="submitComicBtn" class="bg-blue-600 hover:bg-blue-500 px-12 py-4 rounded-2xl font-black shadow-xl">업로드 완료</button>
       </div>
     </div>
   </div>
 
+  <!-- 비밀번호 확인 모달 -->
   <div id="generalPasswordModal" class="modal">
     <div class="modal-content w-full max-w-sm text-center">
       <h2 id="passwordModalTitle" class="text-2xl font-black mb-8 tracking-tighter">VERIFICATION</h2>
@@ -287,8 +264,8 @@
     </div>
   </div>
 
-  <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black shadow-lg">확인</button></div></div>
-  <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8 shadow-2xl shadow-blue-600/20"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
+  <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black">확인</button></div></div>
+  <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -330,16 +307,18 @@
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
 
+    // ✅ 타이머 업데이트 로직
     const updateTimerDisplay = () => {
       const isUploadMode = state.status === 'uploading';
       
-      // ✅ 상태가 uploading이 아니거나 시간이 설정되지 않았으면 타이머 숨김
+      // ✅ uploading 상태일 때만 .hidden을 제거함 (CSS 우선순위 문제 해결을 위해 클래스 조작)
+      const container = el('timerContainer');
       if (!state.timerEnd || !isUploadMode) {
-        el('timerContainer').classList.add('hidden');
+        container.classList.add('hidden');
         return;
       }
 
-      el('timerContainer').classList.remove('hidden');
+      container.classList.remove('hidden');
       const now = Date.now();
       const diff = state.timerEnd - now;
 
@@ -359,10 +338,7 @@
     };
 
     const triggerAutoEnd = async () => {
-      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { 
-        status: 'upload_ended', 
-        timerEnd: 0 
-      }, { merge: true });
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true });
     };
 
     const renderComics = () => {
@@ -377,8 +353,7 @@
         const isOwner = auth.currentUser && c.uploaderId === auth.currentUser.uid;
         let rankClass = "", medal = "";
         if (state.status === 'results' && i < 3) {
-          rankClass = `rank-${i + 1}`; 
-          medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
+          rankClass = `rank-${i + 1}`; medal = `<div class="rank-medal">${['🥇', '🥈', '🥉'][i]}</div>`;
         }
         const card = document.createElement('div');
         card.className = `comic-card ${rankClass} ${state.status === 'uploading' ? 'disabled' : ''}`;
@@ -390,7 +365,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${hasLiked ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
               </svg>
-              <span>${hasLiked ? '완료' : '좋아요'}</span>
+              <span>${hasLiked ? '완료' : '따봉'}</span>
             </button>
             <span class="like-count">${likes}</span>
           </div>
@@ -417,10 +392,7 @@
       el('modalComicNickname').textContent = `${c.uploaderName} 작가님`;
       const con = el('modalImageContainer'); con.innerHTML = '';
       c.images.forEach(img => { 
-        const i = document.createElement('img'); 
-        i.src = img.imageUrl; 
-        i.className = "w-full block"; 
-        con.appendChild(i); 
+        const i = document.createElement('img'); i.src = img.imageUrl; i.className = "w-full block"; con.appendChild(i); 
       });
       el('imageModal').style.display = 'flex';
     };
@@ -432,24 +404,17 @@
         state.timerEnd = data.timerEnd || 0;
         state.autoEndUpload = data.autoEndUpload || false;
         state.hasAutoEnded = false; 
-        
         setAppTitle(data.appTitle);
-        
         if (data.bannerUrl && state.status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
-        
         el('currentTopicText').textContent = state.topic;
         el('currentTopicDisplay').classList.toggle('hidden', !state.topic);
-        
-        refreshUI();
-        renderComics();
-        updateTimerDisplay(); 
+        refreshUI(); renderComics(); updateTimerDisplay(); 
       });
       onSnapshot(query(collection(db, `artifacts/${APP_ID}/public/data/comics`), orderBy("timestamp", "desc")), (s) => {
         state.comics = s.docs.map(d => ({ id: d.id, ...d.data() }));
         renderComics();
       });
-
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateTimerDisplay, 1000);
     };
@@ -465,12 +430,12 @@
       el('endVotingBtn').classList.toggle('hidden', !isMgr || state.status !== "voting");
       el('resetContestBtn').classList.toggle('hidden', !isMgr || state.status !== "results");
       el('openSettingsBtn').classList.toggle('hidden', !isMgr);
-      el('signInBtn').classList.toggle('hidden', !!user);
+      el('signInBtn').classList.toggle('hidden', !!user && !user.isAnonymous);
       el('signOutBtn').classList.toggle('hidden', !user);
     };
 
     const toggleLike = async (id) => {
-      if (!auth.currentUser) return showAlert("투표하려면 로그인이 필요합니다.");
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("투표하려면 구글 로그인이 필요합니다.");
       const c = state.comics.find(x => x.id === id); const uid = auth.currentUser.uid;
       if (!c.likes?.[uid] && state.comics.some(x => x.id !== id && x.likes?.[uid])) return showAlert("투표는 한 작품에만<br>할 수 있습니다!");
       await updateDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, id), { [`likes.${uid}`]: c.likes?.[uid] ? deleteField() : true });
@@ -515,14 +480,6 @@
     const uploadInput = el('comicFilesInput');
     const customUploadBtn = el('customFileUpload');
     customUploadBtn.onclick = () => uploadInput.click();
-    customUploadBtn.addEventListener('dragover', (e) => { e.preventDefault(); customUploadBtn.style.borderColor = '#3b82f6'; customUploadBtn.style.background = '#262626'; });
-    customUploadBtn.addEventListener('dragleave', () => { customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222'; });
-    customUploadBtn.addEventListener('drop', (e) => {
-      e.preventDefault();
-      customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222';
-      const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-      if (droppedFiles.length > 0) { state.files = [...state.files, ...droppedFiles]; renderPreviews(); }
-    });
     uploadInput.onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
 
     const renderPreviews = () => {
@@ -537,8 +494,9 @@
     };
 
     el('submitComicBtn').onclick = async () => {
+      if (!auth.currentUser || auth.currentUser.isAnonymous) return showAlert("업로드하려면 구글 로그인이 필요합니다.");
       const name = el('uploadNickname').value.trim(); 
-      if (!name || state.files.length === 0) return showAlert("작가명을 확인해 주세요.");
+      if (!name || state.files.length === 0) return showAlert("작가명을 입력해 주세요.");
       showLoading(true, "Processing...");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
@@ -549,8 +507,7 @@
           const url = await getDownloadURL(sRef); imgs.push({ imageUrl: url, path });
         }
         await setDoc(ref, { uploaderId: auth.currentUser.uid, uploaderName: name, images: imgs, likes: {}, timestamp: serverTimestamp(), topic: state.topic });
-        el('uploadModal').style.display = 'none'; state.files = []; 
-        showAlert("작품이 성공적으로<br>등록되었습니다!");
+        el('uploadModal').style.display = 'none'; state.files = []; showAlert("작품이 성공적으로<br>등록되었습니다!");
       } catch (e) { showAlert("업로드 실패: " + e.message); } showLoading(false);
     };
 
@@ -573,12 +530,7 @@
     };
 
     el('startContestBtn').onclick = () => { 
-      state.pending = () => {
-        el('topicInput').value = "";
-        el('timerHourInput').value = 0;
-        el('timerMinInput').value = 30;
-        el('topicModal').style.display = 'flex'; 
-      };
+      state.pending = () => { el('topicInput').value = ""; el('timerHourInput').value = 0; el('timerMinInput').value = 30; el('topicModal').style.display = 'flex'; };
       showPasswordModal("CONTEST SETTINGS"); 
     };
 
@@ -589,24 +541,15 @@
       const hour = parseInt(el('timerHourInput').value) || 0;
       const min = parseInt(el('timerMinInput').value) || 0;
       const totalMs = (hour * 3600 + min * 60) * 1000;
-      
       if(!topic) return alert("주제를 입력하세요.");
       if(totalMs <= 0) return alert("마감 시간을 설정하세요.");
-
       showLoading(true, "Settings Applying...");
       const timerEnd = Date.now() + totalMs;
       const autoEnd = el('autoEndCheck').checked;
-
       await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { 
-        status: 'uploading', 
-        topic: topic, 
-        timerEnd: timerEnd,
-        autoEndUpload: autoEnd,
-        updatedAt: serverTimestamp() 
+        status: 'uploading', topic: topic, timerEnd: timerEnd, autoEndUpload: autoEnd, updatedAt: serverTimestamp() 
       }, { merge: true });
-      
-      el('topicModal').style.display = 'none'; 
-      showLoading(false);
+      el('topicModal').style.display = 'none'; showLoading(false);
     };
 
     el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true }); showPasswordModal("업로드 마감"); };
@@ -623,23 +566,17 @@
     };
 
     el('timerContainer').onclick = () => {
-      state.pending = () => { 
-        el('topicInput').value = state.topic;
-        el('topicModal').style.display = 'flex'; 
-      };
+      state.pending = () => { el('topicInput').value = state.topic; el('topicModal').style.display = 'flex'; };
       showPasswordModal("CONTEST SETTINGS EDIT");
     };
 
     const initApp = async () => {
-      try {
-        await signInAnonymously(auth);
-      } catch (e) { console.error("Auth error:", e); }
+      try { await signInAnonymously(auth); } catch (e) {}
       setupSync();
     };
 
     initApp();
     onAuthStateChanged(auth, refreshUI);
-
     el('signInBtn').onclick = () => signInWithPopup(auth, provider);
     el('signOutBtn').onclick = () => signOut(auth);
     el('showUploadModalBtn').onclick = () => { state.files = []; el('imagePreviewArea').innerHTML = ''; el('uploadModal').style.display = 'flex'; };
