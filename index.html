@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
+  <!-- ✅ 공유 시 표시되는 정보 -->
   <title>만투 프로젝트 - 만화로 맞짱뜨자!</title>
   <meta property="og:title" content="만투 프로젝트">
   <meta property="og:description" content="만화로 맞짱뜨자!">
@@ -121,18 +122,27 @@
     }
     .admin-button:hover { background: #1e293b; border-color: #64748b; }
 
-    /* 타이머 디자인 */
+    /* ✅ 수정: 더 크게 강조된 타이머 디자인 */
     #timerContainer {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 12px 24px;
-      border-radius: 16px;
-      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(239, 68, 68, 0.5);
+      padding: 20px 40px;
+      border-radius: 24px;
+      margin: 1.5rem 0;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
     }
-    #timerContainer:hover { background: rgba(239, 68, 68, 0.2); }
-    #timerDisplay { font-family: monospace; font-size: 2rem; font-weight: 900; color: #ef4444; }
+    #timerContainer:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; transform: scale(1.02); }
+    #timerDisplay { 
+      font-family: 'Courier New', Courier, monospace; 
+      font-size: 3.5rem; 
+      font-weight: 900; 
+      color: #ef4444; 
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+    .timer-label { font-size: 0.75rem; font-weight: 900; color: #888; margin-bottom: 8px; letter-spacing: 0.2em; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -158,19 +168,20 @@
     </button>
   </div>
   
-  <!-- 타이틀 아래 타이머 영역 (업로드 시에만 표시) -->
-  <div id="timerContainer" class="hidden text-center">
-    <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">UPLOAD DEADLINE</p>
-    <div id="timerDisplay">00:00:00</div>
-  </div>
-
   <div class="w-full max-w-2xl px-4">
     <img id="mainBanner" class="hidden w-full rounded-3xl shadow-2xl mb-10 object-cover border-4 border-[#1a1a1a]" alt="배너">
   </div>
 
-  <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 text-center mb-10 hidden">
+  <!-- ✅ 토픽 표시 영역 -->
+  <h2 id="currentTopicDisplay" class="text-3xl font-black text-yellow-400 text-center mb-4 hidden">
     TOPIC: <span id="currentTopicText" class="px-3 bg-yellow-400 text-black rounded-lg ml-2"></span>
   </h2>
+
+  <!-- ✅ 수정: 토픽 밑으로 이동된 대형 타이머 영역 -->
+  <div id="timerContainer" class="hidden text-center">
+    <p class="timer-label uppercase">작품 접수 마감까지</p>
+    <div id="timerDisplay">00 : 00 : 00</div>
+  </div>
 
   <div id="comics-section" class="w-full max-w-6xl">
     <section class="text-center mb-12 flex flex-wrap justify-center gap-5">
@@ -210,7 +221,7 @@
     </div>
   </div>
 
-  <!-- (기존 모달들 유지) -->
+  <!-- 관리자 설정 모달 -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
       <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
@@ -235,12 +246,14 @@
     </div>
   </div>
 
+  <!-- 업로드 모달 (닉네임 -> 작가명 수정) -->
   <div id="uploadModal" class="modal">
     <div class="modal-content w-full max-w-xl">
       <h2 class="text-3xl font-black mb-10 text-center tracking-tight">작품 업로드</h2>
       <div class="mb-8">
+        <!-- ✅ 수정: 활동 닉네임 -> 작가명 -->
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Author Name</label>
-        <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="활동 닉네임">
+        <input type="text" id="uploadNickname" class="w-full p-4 rounded-2xl bg-gray-900 border border-gray-800 text-white font-black text-xl" placeholder="작가명">
       </div>
       <div class="mb-4">
         <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-widest">Select Comics</label>
@@ -276,6 +289,7 @@
     </div>
   </div>
 
+  <!-- 알림/로딩 -->
   <div id="alert-modal" class="modal"><div class="modal-content max-w-xs text-center"><p id="modal-message" class="text-lg font-bold mb-10"></p><button id="modal-confirm-btn" class="w-full py-4 bg-blue-600 rounded-2xl font-black">확인</button></div></div>
   <div id="loading-overlay" class="fixed inset-0 bg-black/90 z-[2000] flex items-center justify-center hidden"><div class="flex flex-col items-center"><div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-8"></div><p id="loading-text" class="text-xl font-black text-blue-500 tracking-tighter uppercase">Processing...</p></div></div>
 
@@ -313,14 +327,13 @@
       return new Promise(res => { el('modal-confirm-btn').onclick = () => { el('alert-modal').style.display = 'none'; res(); }; });
     };
 
-    // ✅ 타이틀 및 탭 이름 설정 로직 통합
     const setAppTitle = (title) => {
       const finalTitle = title || "만투 프로젝트";
       el('mainTitleDisplay').textContent = finalTitle;
       document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
     };
 
-    // ✅ 타이머 로직
+    // ✅ 수정: 초시계 포함 및 공백 있는 00 : 00 : 00 형식 타이머
     const updateTimerDisplay = () => {
       if (!state.timerEnd || state.status !== 'uploading') {
         el('timerContainer').classList.add('hidden');
@@ -332,22 +345,21 @@
       const diff = state.timerEnd - now;
 
       if (diff <= 0) {
-        el('timerDisplay').textContent = "00:00:00";
+        el('timerDisplay').textContent = "00 : 00 : 00";
         if (state.autoEndUpload && state.status === 'uploading' && !state.hasAutoEnded) {
-          state.hasAutoEnded = true; // 중복 실행 방지
+          state.hasAutoEnded = true;
           triggerAutoEnd();
         }
         return;
       }
 
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      el('timerDisplay').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      el('timerDisplay').textContent = `${h} : ${m} : ${s}`;
     };
 
     const triggerAutoEnd = async () => {
-      // 업로드 마감 상태로 강제 전환 (누군가 한 명이라도 온라인이면 실행됨)
       await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true });
     };
 
@@ -417,12 +429,13 @@
         state.status = data.status || ""; state.topic = data.topic || "";
         state.timerEnd = data.timerEnd || 0;
         state.autoEndUpload = data.autoEndUpload || false;
-        state.hasAutoEnded = false; // 마감 처리 상태 초기화
+        state.hasAutoEnded = false;
         
         setAppTitle(data.appTitle);
         
         if (data.bannerUrl && state.status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
+        
         el('currentTopicText').textContent = state.topic;
         el('currentTopicDisplay').classList.toggle('hidden', !state.topic);
         
@@ -498,9 +511,7 @@
 
     const uploadInput = el('comicFilesInput');
     const customUploadBtn = el('customFileUpload');
-    
     customUploadBtn.onclick = () => uploadInput.click();
-    
     customUploadBtn.addEventListener('dragover', (e) => { e.preventDefault(); customUploadBtn.style.borderColor = '#3b82f6'; customUploadBtn.style.background = '#262626'; });
     customUploadBtn.addEventListener('dragleave', () => { customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222'; });
     customUploadBtn.addEventListener('drop', (e) => {
@@ -509,7 +520,6 @@
       const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
       if (droppedFiles.length > 0) { state.files = [...state.files, ...droppedFiles]; renderPreviews(); }
     });
-
     uploadInput.onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
 
     const renderPreviews = () => {
@@ -525,7 +535,7 @@
 
     el('submitComicBtn').onclick = async () => {
       const name = el('uploadNickname').value.trim(); 
-      if (!name || state.files.length === 0) return showAlert("닉네임과 작품 사진을 확인해 주세요.");
+      if (!name || state.files.length === 0) return showAlert("작가명과 작품 사진을 확인해 주세요.");
       showLoading(true, "Processing...");
       try {
         const ref = doc(collection(db, `artifacts/${APP_ID}/public/data/comics`)); const imgs = [];
@@ -559,13 +569,13 @@
       } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
     };
 
-    // ✅ 타이머 클릭 및 저장 로직
+    // ✅ 타이머 클릭 -> 비밀번호 확인 -> 시간 설정 로직
     el('timerContainer').onclick = () => {
       state.pending = () => { el('timerSettingsModal').style.display = 'flex'; };
       showPasswordModal("TIMER SETTING");
     };
 
-    el('closeTimerModalBtn').onclick = () => el('timerSettingsModal').style.display = 'none';
+    el('closeTimerModalBtn').onclick = () => { el('timerSettingsModal').style.display = 'none'; };
     
     el('saveTimerBtn').onclick = async () => {
       const min = parseInt(el('timerMinInput').value) || 0;
