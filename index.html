@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <!-- ✅ 공유 시 표시되는 정보 (Open Graph) -->
   <title>만투 프로젝트 - 만화로 맞짱뜨자!</title>
   <meta property="og:title" content="만투 프로젝트">
   <meta property="og:description" content="만화로 맞짱뜨자!">
   <meta name="description" content="만화로 맞짱뜨자!">
-  
+  <meta name="apple-mobile-web-app-title" content="만투 프로젝트">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
   <style>
@@ -103,17 +103,8 @@
     }
     
     .custom-file-upload {
-      border: 2px dashed #444;
-      border-radius: 20px;
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: #222;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+      border: 2px dashed #444; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer;
+      transition: all 0.3s ease; background: #222; display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
     .custom-file-upload:hover { border-color: #3b82f6; background: #262626; }
     .custom-file-upload svg { color: #666; width: 48px; height: 48px; transition: color 0.3s ease; }
@@ -129,6 +120,19 @@
       cursor: pointer; font-weight: 700; transition: all 0.2s ease; border: 1px solid #475569;
     }
     .admin-button:hover { background: #1e293b; border-color: #64748b; }
+
+    /* 타이머 디자인 */
+    #timerContainer {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #timerContainer:hover { background: rgba(239, 68, 68, 0.2); }
+    #timerDisplay { font-family: monospace; font-size: 2rem; font-weight: 900; color: #ef4444; }
     
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; border: 2px solid #1a1a1a; }
@@ -145,15 +149,21 @@
 
   <!-- 메인 타이틀 영역 -->
   <div class="w-full max-w-2xl flex items-center justify-center relative mb-8 px-12">
-    <h1 id="mainTitleDisplay" class="text-5xl font-black text-center text-white tracking-tighter italic">만투</h1>
+    <h1 id="mainTitleDisplay" class="text-5xl font-black text-center text-white tracking-tighter italic">만투 프로젝트</h1>
     <button id="openSettingsBtn" class="absolute right-0 p-2 text-gray-600 hover:text-white transition-colors hidden">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     </button>
   </div>
   
+  <!-- 타이틀 아래 타이머 영역 (업로드 시에만 표시) -->
+  <div id="timerContainer" class="hidden text-center">
+    <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">UPLOAD DEADLINE</p>
+    <div id="timerDisplay">00:00:00</div>
+  </div>
+
   <div class="w-full max-w-2xl px-4">
     <img id="mainBanner" class="hidden w-full rounded-3xl shadow-2xl mb-10 object-cover border-4 border-[#1a1a1a]" alt="배너">
   </div>
@@ -171,10 +181,36 @@
       <button id="endVotingBtn" class="admin-button hidden">결과 발표</button>
       <button id="resetContestBtn" class="admin-button hidden text-red-400">데이터 초기화</button>
     </section>
-
     <div id="comic-grid"></div>
   </div>
 
+  <!-- 타이머 설정 모달 -->
+  <div id="timerSettingsModal" class="modal">
+    <div class="modal-content w-full max-w-sm text-center">
+      <h2 class="text-2xl font-black mb-8 tracking-tighter">TIMER SETTING</h2>
+      <div class="flex gap-4 mb-8 justify-center items-end">
+        <div class="flex-1">
+          <label class="block text-[10px] font-black text-gray-500 mb-2">MINUTES</label>
+          <input type="number" id="timerMinInput" value="30" class="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-2xl text-center">
+        </div>
+        <div class="text-3xl font-black pb-2 text-gray-700">:</div>
+        <div class="flex-1">
+          <label class="block text-[10px] font-black text-gray-500 mb-2">SECONDS</label>
+          <input type="number" id="timerSecInput" value="0" class="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-white font-black text-2xl text-center">
+        </div>
+      </div>
+      <div class="flex items-center justify-between mb-8 bg-gray-900 p-4 rounded-xl">
+        <span class="text-sm font-bold text-gray-400">종료 시 자동 마감</span>
+        <input type="checkbox" id="autoEndCheck" class="w-6 h-6 rounded accent-red-600" checked>
+      </div>
+      <div class="flex justify-center gap-3">
+        <button id="closeTimerModalBtn" class="bg-gray-800 px-6 py-3 rounded-xl font-bold">취소</button>
+        <button id="saveTimerBtn" class="bg-red-600 px-6 py-3 rounded-xl font-black">START TIMER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- (기존 모달들 유지) -->
   <div id="settingsModal" class="modal">
     <div class="modal-content w-full max-w-md text-center">
       <h2 class="text-3xl font-black mb-10 tracking-tight">ADMIN CENTER</h2>
@@ -213,7 +249,6 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           <span class="font-bold text-gray-400">이미지 파일을 여기에 놓거나 클릭하세요</span>
-          <span class="text-xs text-gray-600 font-medium">(여러 장 선택 가능)</span>
         </div>
         <input type="file" id="comicFilesInput" multiple accept="image/*" class="hidden">
       </div>
@@ -266,7 +301,8 @@
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
-    let state = { status: "", topic: "", comics: [], files: [], pending: null };
+    let state = { status: "", topic: "", comics: [], files: [], pending: null, timerEnd: 0, autoEndUpload: false };
+    let timerInterval = null;
 
     const el = (id) => document.getElementById(id);
     const showLoading = (show, text = "Processing...") => { el('loading-text').textContent = text; el('loading-overlay').classList.toggle('hidden', !show); };
@@ -277,14 +313,50 @@
       return new Promise(res => { el('modal-confirm-btn').onclick = () => { el('alert-modal').style.display = 'none'; res(); }; });
     };
 
+    // ✅ 타이틀 및 탭 이름 설정 로직 통합
+    const setAppTitle = (title) => {
+      const finalTitle = title || "만투 프로젝트";
+      el('mainTitleDisplay').textContent = finalTitle;
+      document.title = `${finalTitle} - 만화로 맞짱뜨자!`;
+    };
+
+    // ✅ 타이머 로직
+    const updateTimerDisplay = () => {
+      if (!state.timerEnd || state.status !== 'uploading') {
+        el('timerContainer').classList.add('hidden');
+        return;
+      }
+
+      el('timerContainer').classList.remove('hidden');
+      const now = Date.now();
+      const diff = state.timerEnd - now;
+
+      if (diff <= 0) {
+        el('timerDisplay').textContent = "00:00:00";
+        if (state.autoEndUpload && state.status === 'uploading' && !state.hasAutoEnded) {
+          state.hasAutoEnded = true; // 중복 실행 방지
+          triggerAutoEnd();
+        }
+        return;
+      }
+
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el('timerDisplay').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    };
+
+    const triggerAutoEnd = async () => {
+      // 업로드 마감 상태로 강제 전환 (누군가 한 명이라도 온라인이면 실행됨)
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true });
+    };
+
     const renderComics = () => {
       const grid = el('comic-grid'); grid.innerHTML = '';
       let list = [...state.comics];
       if (state.topic) list = list.filter(c => c.topic === state.topic);
-      if (state.status === 'results') {
-        list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
-      }
-      if (list.length === 0) return;
+      if (state.status === 'results') list.sort((a, b) => Object.keys(b.likes || {}).length - Object.keys(a.likes || {}).length);
+      
       list.forEach((c, i) => {
         const likes = Object.keys(c.likes || {}).length;
         const hasLiked = auth.currentUser && c.likes?.[auth.currentUser.uid];
@@ -343,15 +415,17 @@
       onSnapshot(doc(db, `artifacts/${APP_ID}/public/data/config/current`), (d) => {
         const data = d.data(); if (!data) return;
         state.status = data.status || ""; state.topic = data.topic || "";
-        el('mainTitleDisplay').textContent = data.appTitle || "만투";
+        state.timerEnd = data.timerEnd || 0;
+        state.autoEndUpload = data.autoEndUpload || false;
+        state.hasAutoEnded = false; // 마감 처리 상태 초기화
         
-        // ✅ 수정: 실시간 업데이트 시에도 '만투 프로젝트'가 기본값이 되도록 변경
-        document.title = `${data.appTitle || "만투 프로젝트"} - 만화로 맞짱뜨자!`;
+        setAppTitle(data.appTitle);
         
         if (data.bannerUrl && state.status === "") { el('mainBanner').src = data.bannerUrl; el('mainBanner').classList.remove('hidden'); }
         else { el('mainBanner').classList.add('hidden'); }
         el('currentTopicText').textContent = state.topic;
         el('currentTopicDisplay').classList.toggle('hidden', !state.topic);
+        
         refreshUI();
         renderComics();
       });
@@ -359,6 +433,9 @@
         state.comics = s.docs.map(d => ({ id: d.id, ...d.data() }));
         renderComics();
       });
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimerDisplay, 1000);
     };
 
     const refreshUI = () => {
@@ -410,10 +487,7 @@
           img.onload = () => {
             const canvas = document.createElement('canvas');
             let w = img.width, h = img.height;
-            if (w > maxWidth) { 
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth; 
-            }
+            if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
             canvas.toBlob((b) => res(b.size < file.size ? b : file), 'image/jpeg', quality);
@@ -427,30 +501,16 @@
     
     customUploadBtn.onclick = () => uploadInput.click();
     
-    customUploadBtn.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      customUploadBtn.style.borderColor = '#3b82f6';
-      customUploadBtn.style.background = '#262626';
-    });
-    customUploadBtn.addEventListener('dragleave', () => {
-      customUploadBtn.style.borderColor = '#444';
-      customUploadBtn.style.background = '#222';
-    });
+    customUploadBtn.addEventListener('dragover', (e) => { e.preventDefault(); customUploadBtn.style.borderColor = '#3b82f6'; customUploadBtn.style.background = '#262626'; });
+    customUploadBtn.addEventListener('dragleave', () => { customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222'; });
     customUploadBtn.addEventListener('drop', (e) => {
       e.preventDefault();
-      customUploadBtn.style.borderColor = '#444';
-      customUploadBtn.style.background = '#222';
+      customUploadBtn.style.borderColor = '#444'; customUploadBtn.style.background = '#222';
       const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-      if (droppedFiles.length > 0) {
-        state.files = [...state.files, ...droppedFiles];
-        renderPreviews();
-      }
+      if (droppedFiles.length > 0) { state.files = [...state.files, ...droppedFiles]; renderPreviews(); }
     });
 
-    uploadInput.onchange = (e) => { 
-      state.files = Array.from(e.target.files); 
-      renderPreviews(); 
-    };
+    uploadInput.onchange = (e) => { state.files = Array.from(e.target.files); renderPreviews(); };
 
     const renderPreviews = () => {
       const area = el('imagePreviewArea'); area.innerHTML = '';
@@ -499,6 +559,34 @@
       } catch (e) { showAlert("배너 업로드 실패"); } showLoading(false);
     };
 
+    // ✅ 타이머 클릭 및 저장 로직
+    el('timerContainer').onclick = () => {
+      state.pending = () => { el('timerSettingsModal').style.display = 'flex'; };
+      showPasswordModal("TIMER SETTING");
+    };
+
+    el('closeTimerModalBtn').onclick = () => el('timerSettingsModal').style.display = 'none';
+    
+    el('saveTimerBtn').onclick = async () => {
+      const min = parseInt(el('timerMinInput').value) || 0;
+      const sec = parseInt(el('timerSecInput').value) || 0;
+      const totalMs = (min * 60 + sec) * 1000;
+      
+      if (totalMs <= 0) return alert("시간을 설정해주세요.");
+      
+      const timerEnd = Date.now() + totalMs;
+      const autoEnd = el('autoEndCheck').checked;
+      
+      showLoading(true);
+      await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { 
+        timerEnd: timerEnd, 
+        autoEndUpload: autoEnd 
+      }, { merge: true });
+      
+      el('timerSettingsModal').style.display = 'none';
+      showLoading(false);
+    };
+
     el('startContestBtn').onclick = () => { state.pending = () => el('topicModal').style.display = 'flex'; showPasswordModal("대전 시작"); };
     el('submitTopicBtn').onclick = async () => {
       const topic = el('topicInput').value.trim(); if(!topic) return;
@@ -506,15 +594,15 @@
       await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'uploading', topic: topic, updatedAt: serverTimestamp() }, { merge: true });
       el('topicModal').style.display = 'none'; showLoading(false);
     };
-    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended' }, { merge: true }); showPasswordModal("업로드 마감"); };
+    el('endContestBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'upload_ended', timerEnd: 0 }, { merge: true }); showPasswordModal("업로드 마감"); };
     el('startVotingBtn').onclick = () => { state.pending = () => setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'voting' }, { merge: true }); showPasswordModal("투표 시작"); };
-    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
+    el('endVotingBtn').onclick = () => { state.pending = async () => { await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: 'results' }, { merge: true }); }; showPasswordModal("결과 발표"); };
     el('resetContestBtn').onclick = () => {
       state.pending = async () => {
         if (confirm("정말로 모든 데이터를 초기화하시겠습니까?")) {
           showLoading(true, "Cleaning...");
           for (const c of state.comics) { for (const img of c.images) await deleteObject(storageRef(storage, img.path)).catch(()=>{}); await deleteDoc(doc(db, `artifacts/${APP_ID}/public/data/comics`, c.id)); }
-          await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '' }, { merge: true }); showLoading(false);
+          await setDoc(doc(db, `artifacts/${APP_ID}/public/data/config/current`), { status: '', topic: '', timerEnd: 0 }, { merge: true }); showLoading(false);
         }
       }; showPasswordModal("데이터 초기화");
     };
